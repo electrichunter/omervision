@@ -1,0 +1,45 @@
+# Switch to a Debian-based Node.js image for full glibc support
+
+FROM node:25-alpine
+
+
+
+WORKDIR /app
+
+
+
+# Paket listelerini kopyala
+
+COPY package*.json ./
+
+
+
+# Bağımlılıkları yükle
+
+# --legacy-peer-deps: Versiyon çakışmalarını görmezden gelip kurması için (Opsiyonel ama hayat kurtarır)
+
+RUN npm install --legacy-peer-deps
+
+
+
+# Install glibc to resolve missing library issues
+
+RUN apk add --no-cache libc6-compat
+
+
+
+# Kalan dosyaları kopyala
+
+COPY . .
+
+
+
+# Portu dışarı aç
+
+EXPOSE 3000
+
+
+
+# Uygulamayı başlat
+
+CMD ["npm", "run", "dev"]

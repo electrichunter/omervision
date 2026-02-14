@@ -1,0 +1,102 @@
+ 
+services:
+  # 1. Veritabanı (MySQL 9.0)
+  db:
+    image: mysql:9.0
+    container_name: blog_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword # Prodüksiyonda bunu değiştir!
+      MYSQL_DATABASE: blog_db
+      MYSQL_USER: blog_user
+      MYSQL_PASSWORD: blog_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql # Veri kaybını önlemek için volume
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # 2. Veritabanı Yönetimi (phpMyAdmin)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: blog_pma
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "8080:80" # Tarayıcıda localhost:8080 ile erişirsin
+    networks:
+      - app-network
+
+  # 3. NoSQL / Cache (Redis)
+  redis:
+    image: redis:alpine
+    container_name: blog_redis
+    restart: always
+    command: redis-server --appendonly yes # Verileri diske yazar (NoSQL gibi davranması için)
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis_data:/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 4. Backend (FastAPI - Python)
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: blog_backend
+    restart: always
+    volumes:
+      - ./backend:/app # Hot-reload için kodu bağlıyoruz
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: mysql+mysqlconnector://blog_user:blog_password@db/blog_db
+      REDIS_URL: redis://redis:6379/0
+    networks:
+      - app-network
+
+  # 5. Frontend (Next.js - TypeScript)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: blog_frontend
+    restart: always
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # Container içindeki modülleri ezmemek için
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
