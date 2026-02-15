@@ -8,7 +8,7 @@ Bu proje, yüksek performanslı, ölçeklenebilir ve modern bir web deneyimi sun
 graph TD
     User((👤 Kullanıcı))
     
-    subgraph Frontend [🖥️ Frontend (Next.js 15+)]
+    subgraph Frontend [🖥️ Frontend (Next.js 16)]
         UI[Arayüz Componentleri]
         Editor[📝 Quill Editor]
         Dashboard[📊 Tremor Dashboard]
@@ -41,7 +41,7 @@ Kullanıcı deneyimini en üst düzeye çıkarmak için modern React ekosistemi 
 
 | Teknoloji | Simge | Açıklama |
 | :--- | :---: | :--- |
-| **Next.js 15** | ⚫ | **App Router** mimarisi ile sunucu taraflı işleme (SSR) ve SEO optimizasyonu. |
+| **Next.js 16** | ⚫ | **App Router** mimarisi ile sunucu taraflı işleme (SSR) ve SEO optimizasyonu. |
 | **Tailwind CSS** | 🌊 | Hızlı, esnek ve modern stil tanımlamaları. |
 | **React Quill** | ✍️ | Zengin metin editörü. Yazarların içerik üretmesini kolaylaştırır. |
 | **Tremor** | 📈 | Dashboard veri görselleştirmesi için profesyonel grafikler. |

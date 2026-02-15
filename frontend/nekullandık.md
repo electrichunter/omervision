@@ -5,7 +5,7 @@ Bu proje, modern ve ölçeklenebilir bir web uygulaması mimarisi üzerine inşa
 ## 🛠 Kullanılan Teknolojiler
 
 ### Frontend (İstemci Tarafı)
-- **Next.js 15+ (App Router)**: React tabanlı framework. SEO dostu ve hızlı.
+- **Next.js 16 (App Router)**: React tabanlı framework. SEO dostu ve hızlı.
 - **Tailwind CSS**: Hızlı ve esnek stillendirme için.
 - **React Quill**: Zengin metin editörü (WYSIWYG) için. Yazarların içerik oluşturmasını sağlar.
 - **Tremor / Recharts**: Dashboard veri görselleştirmesi için component kütüphanesi.
