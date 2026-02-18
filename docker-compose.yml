@@ -1,27 +1,27 @@
- 
 services:
-  # 1. Veritabanı (MySQL 9.0)
+  # 1. Veritabanı
   db:
     image: mysql:9.0
     container_name: blog_mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword # Prodüksiyonda bunu değiştir!
+      MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: blog_db
       MYSQL_USER: blog_user
       MYSQL_PASSWORD: blog_password
     ports:
       - "3306:3306"
     volumes:
-      - ./mysql_data:/var/lib/mysql # Veri kaybını önlemek için volume
+      - ./mysql_data:/var/lib/mysql
     networks:
       - app-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
+      interval: 10s
+      timeout: 5s
       retries: 10
 
-  # 2. Veritabanı Yönetimi (phpMyAdmin)
+  # 2. Veritabanı Yönetimi
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: blog_pma
@@ -32,18 +32,17 @@ services:
     environment:
       PMA_HOST: db
       PMA_PORT: 3306
-      UPLOAD_LIMIT: 64M
     ports:
-      - "8080:80" # Tarayıcıda localhost:8080 ile erişirsin
+      - "8080:80"
     networks:
       - app-network
 
-  # 3. NoSQL / Cache (Redis)
+  # 3. NoSQL / Cache
   redis:
     image: redis:alpine
     container_name: blog_redis
     restart: always
-    command: redis-server --appendonly yes # Verileri diske yazar (NoSQL gibi davranması için)
+    command: redis-server --appendonly yes
     ports:
       - "6379:6379"
     volumes:
@@ -56,7 +55,29 @@ services:
       timeout: 5s
       retries: 5
 
-  # 4. Backend (FastAPI - Python)
+  # 4. Object Storage (MinIO)
+  minio:
+    image: minio/minio
+    container_name: blog_minio
+    restart: always
+    ports:
+      - "9000:9000" # API
+      - "9001:9001" # Console
+    volumes:
+      - ./minio_data:/data
+    environment:
+      MINIO_ROOT_USER: minio_admin
+      MINIO_ROOT_PASSWORD: minio_password
+    command: server /data --console-address ":9001"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 5. Backend (FastAPI)
   backend:
     build: 
       context: ./backend
@@ -64,7 +85,7 @@ services:
     container_name: blog_backend
     restart: always
     volumes:
-      - ./backend:/app # Hot-reload için kodu bağlıyoruz
+      - ./backend:/app
     ports:
       - "8000:8000"
     depends_on:
@@ -72,13 +93,18 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      minio:
+        condition: service_healthy
     environment:
-      DATABASE_URL: mysql+mysqlconnector://blog_user:blog_password@db/blog_db
+      DATABASE_URL: mysql+pymysql://blog_user:blog_password@db/blog_db
       REDIS_URL: redis://redis:6379/0
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minio_admin
+      MINIO_SECRET_KEY: minio_password
     networks:
       - app-network
 
-  # 5. Frontend (Next.js - TypeScript)
+  # 6. Frontend (Next.js)
   frontend:
     build:
       context: ./frontend
@@ -87,11 +113,12 @@ services:
     restart: always
     volumes:
       - ./frontend:/app
-      - /app/node_modules # Container içindeki modülleri ezmemek için
+      - /app/node_modules
     ports:
       - "3000:3000"
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000
     networks:

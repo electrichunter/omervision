@@ -1,51 +1,84 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Text
+import datetime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
+from database import Base
 
-Base = declarative_base()
-
-class Role(Base):
-    __tablename__ = "roles"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(50), unique=True, index=True)
-    description = Column(String(255), nullable=True)
-
-    users = relationship("UserRole", back_populates="role")
 
 class User(Base):
-    __tablename__ = "users"
-
+    __tablename__ = 'users'
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String(50), unique=True, index=True)
-    email = Column(String(100), unique=True, index=True)
-    display_name = Column(String(100), nullable=True)
-    password_hash = Column(String(255))
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    password_hash = Column(String(255), nullable=False)
+    display_name = Column(String(100), nullable=False)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    roles = relationship("UserRole", back_populates="user")
-    posts = relationship("Post", back_populates="author")
+    roles = relationship('UserRole', back_populates='user')
+
+
+class Role(Base):
+    __tablename__ = 'roles'
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(50), unique=True, nullable=False, index=True)
+    slug = Column(String(50), unique=True, nullable=False)
+    description = Column(String(255))
+    is_default = Column(Boolean, default=False)
+
+    users = relationship('UserRole', back_populates='role')
+    permissions = relationship('RolePermission', back_populates='role')
+
 
 class UserRole(Base):
-    __tablename__ = "user_roles"
+    __tablename__ = 'user_roles'
+    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    role_id = Column(Integer, ForeignKey('roles.id'), primary_key=True)
 
+    user = relationship('User', back_populates='roles')
+    role = relationship('Role', back_populates='users')
+
+
+class Permission(Base):
+    __tablename__ = 'permissions'
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    role_id = Column(Integer, ForeignKey("roles.id"))
+    name = Column(String(100), unique=True, nullable=False)
+    slug = Column(String(100), unique=True, nullable=False)
+    description = Column(String(255))
+    group = Column(String(50))
 
-    user = relationship("User", back_populates="roles")
-    role = relationship("Role", back_populates="users")
+    roles = relationship('RolePermission', back_populates='permission')
 
-class Post(Base):
-    __tablename__ = "posts"
 
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(255), index=True)
-    content = Column(Text)  # Quill content (HTML or JSON)
-    author_id = Column(Integer, ForeignKey("users.id"))
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+class RolePermission(Base):
+    __tablename__ = 'role_permissions'
+    role_id = Column(Integer, ForeignKey('roles.id'), primary_key=True)
+    permission_id = Column(Integer, ForeignKey('permissions.id'), primary_key=True)
 
-    author = relationship("User", back_populates="posts")
+    role = relationship('Role', back_populates='permissions')
+    permission = relationship('Permission', back_populates='roles')
+
+
+class Project(Base):
+    __tablename__ = 'projects'
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    title = Column(String(200))
+    image = Column(String(255))
+    tags = Column(String(255))  # comma-separated
+    date = Column(String(20))
+    author = Column(String(100))
+    avatar = Column(String(255))
+    href = Column(String(255))
+    excerpt = Column(String(500))
+
+
+class Blog(Base):
+    __tablename__ = 'blogs'
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    title = Column(String(200))
+    image = Column(String(255))
+    tags = Column(String(255))  # comma-separated
+    date = Column(String(20))
+    author = Column(String(100))
+    avatar = Column(String(255))
+    href = Column(String(255))
+    excerpt = Column(String(500))

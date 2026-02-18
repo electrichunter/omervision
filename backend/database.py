@@ -1,23 +1,30 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 import os
+from typing import Generator
 
-# Docker ortam değişkenlerinden URL'i al, yoksa varsayılanı kullan
-DATABASE_URL = os.getenv("DATABASE_URL", "mysql+mysqlconnector://blog_user:blog_password@db/blog_db")
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-# MySQL Bağlantı Motoru
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+# If DATABASE_URL is not provided, fall back to a local SQLite for development.
+DATABASE_URL = os.getenv("DATABASE_URL", None)
 
-# Veritabanı Oturumu
+if DATABASE_URL:
+    # Expecting a URL like: mysql+pymysql://user:password@host:3306/dbname
+    engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+else:
+    # Lightweight fallback for local development without DB setup
+    engine = create_engine("sqlite:///./devportfolio.db", connect_args={"check_same_thread": False})
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Modellerin miras alacağı temel sınıf
 Base = declarative_base()
 
-def get_db():
+
+def get_db() -> Generator:
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+
+def init_db():
+    Base.metadata.create_all(bind=engine)

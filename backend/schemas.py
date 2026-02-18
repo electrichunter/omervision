@@ -1,56 +1,58 @@
-from pydantic import BaseModel, EmailStr
 from typing import List, Optional
-from datetime import datetime
+from pydantic import BaseModel
 
-# --- ROLE SCHEMAS ---
-class RoleBase(BaseModel):
+
+class UserCreate(BaseModel):
+    username: str
+    email: str
+    password: str
+    display_name: str
+    roles: List[str] = []
+
+
+class UserOut(BaseModel):
+    id: int
+    username: str
+    email: str
+    display_name: str
+    is_active: bool
+    roles: List[str] = []
+
+    model_config = {"from_attributes": True}
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class ProjectOut(BaseModel):
+    id: int
+    title: str
+    image: str
+    tags: str
+    date: str
+    author: str
+    avatar: Optional[str] = None
+    href: str
+    excerpt: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+class BlogOut(ProjectOut):
+    pass
+
+
+class SubscribeRequest(BaseModel):
+    email: str
+
+
+class RoleCreate(BaseModel):
     name: str
     description: Optional[str] = None
 
-class Role(RoleBase):
-    id: int
-    class Config:
-        from_attributes = True
 
-# --- POST SCHEMAS ---
-class PostBase(BaseModel):
-    title: str
-    content: str
-
-class PostCreate(PostBase):
-    pass
-
-class Post(PostBase):
-    id: int
-    author_id: int
-    created_at: datetime
-    updated_at: datetime
-    
-    class Config:
-        from_attributes = True
-
-# --- USER SCHEMAS ---
-class UserBase(BaseModel):
+class LoginRequest(BaseModel):
     username: str
-    email: EmailStr
-    display_name: Optional[str] = None
-
-class UserCreate(UserBase):
     password: str
-
-class UserOut(UserBase):
-    id: int
-    is_active: bool
-    created_at: datetime
-    # roles: List[Role] = [] #  İleri aşamada eklenebilir
-
-    class Config:
-        from_attributes = True
-
-# --- TOKEN SCHEMAS ---
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-class TokenData(BaseModel):
-    username: Optional[str] = None

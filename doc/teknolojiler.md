@@ -8,22 +8,22 @@ Bu proje, yüksek performanslı, ölçeklenebilir ve modern bir web deneyimi sun
 graph TD
     User((👤 Kullanıcı))
     
-    subgraph Frontend [🖥️ Frontend (Next.js 16)]
-        UI[Arayüz Componentleri]
-        Editor[📝 Quill Editor]
-        Dashboard[📊 Tremor Dashboard]
-        Auth[🔐 RoleGuard RBAC]
+    subgraph Frontend ["🖥️ Frontend (Next.js 16)"]
+        UI["Arayüz Componentleri"]
+        Editor["📝 Quill Editor"]
+        Dashboard["📊 Tremor Dashboard"]
+        Auth["🔐 RoleGuard RBAC"]
     end
     
-    subgraph Backend [⚙️ Backend (FastAPI)]
-        API[FastAPI Router]
-        AuthService[JWT & Hashing]
-        ORM[SQLAlchemy]
+    subgraph Backend ["⚙️ Backend (FastAPI)"]
+        API["FastAPI Router"]
+        AuthService["JWT & Hashing"]
+        ORM["SQLAlchemy"]
     end
     
-    subgraph Data [💾 Veri Katmanı]
-        MySQL[(🐬 MySQL)]
-        Redis[(⚡ Redis Cache)]
+    subgraph Data ["💾 Veri Katmanı"]
+            MySQL["(🐬 MySQL)"]
+            Redis["(⚡ Redis Cache)"]
     end
     
     User -->|HTTPS| UI

@@ -16,7 +16,7 @@
 **/backend/htmlcov/
 
 # --- NODE / FRONTEND ---
-**/node_modules/a
+**/node_modules/
 **/.next/
 **/out/
 **/build/
@@ -35,3 +35,5 @@ Thumbs.db
 **/.vscode/
 **/.idea/
 **/*.log
+**/mino_data/
+**/redis_data/
