@@ -72,12 +72,12 @@ class MinioStorage:
                 Body=content,
                 ContentType=content_type
             )
-            return f"http://{settings.MINIO_ENDPOINT}/{self.bucket}/{filename}"
+            return f"http://{settings.MINIO_PUBLIC_ENDPOINT}/{self.bucket}/{filename}"
 
 def get_cdn_url(path: str) -> str:
     """Prepends MinIO or CDN domain to asset paths."""
     if path.startswith("http"): return path
-    return f"http://{settings.MINIO_ENDPOINT}/omervision-assets/{path}"
+    return f"http://{settings.MINIO_PUBLIC_ENDPOINT}/omervision-assets/{path}"
 
 def generate_og_image(title: str) -> bytes:
     """Generates a dynamic 1200x630 OG image with content title."""

@@ -61,4 +61,5 @@ export interface SystemStatus {
   memory: number;
   disk: number;
   uptime: number;
+  maintenance_mode?: boolean;
 }

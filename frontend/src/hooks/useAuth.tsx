@@ -22,7 +22,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             try {
                 const u = await api.getCurrentUser();
                 setUser(u);
-            } catch (e) {
+            } catch {
+                // 401 is expected when not logged in — silently handle
                 setUser(null);
             } finally {
                 setLoading(false);
@@ -32,21 +33,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const login = async (credentials: any) => {
-        const res: any = await api.login(credentials);
-        if (res.status === 'mfa_required') {
-            throw new Error('mfa_required');
-        }
-        // If login successful, fetch user details immediately
+        setLoading(true);
         try {
+            const res: any = await api.login(credentials);
+            if (res.status === 'mfa_required') {
+                throw new Error('mfa_required');
+            }
+            // Login successful — fetch user details immediately
             const u = await api.getCurrentUser();
             setUser(u);
         } catch (e) {
-            console.error('Failed to fetch user after login', e);
+            throw e;
+        } finally {
+            setLoading(false);
         }
     };
 
     const logout = async () => {
-        await api.logout();
+        try {
+            await api.logout();
+        } catch {
+            // logout may fail if token already expired — that's fine
+        }
         setUser(null);
     };
 
@@ -55,8 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout, hasRole }
-        }>
+        <AuthContext.Provider value={{ user, loading, login, logout, hasRole }}>
             {children}
         </AuthContext.Provider>
     );

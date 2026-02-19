@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -12,8 +12,19 @@ export default function LoginPage() {
     const [totpCode, setTotpCode] = useState('');
     const [error, setError] = useState('');
     const [mfaRequired, setMfaRequired] = useState(false);
-    const { login } = useAuth();
+    const { user, loading, login, hasRole } = useAuth();
     const router = useRouter();
+
+    // If already logged in, redirect based on role
+    useEffect(() => {
+        if (!loading && user) {
+            router.replace(hasRole('admin') ? '/dashboard' : '/');
+        }
+    }, [user, loading, router]);
+
+    // Show nothing while checking auth status
+    if (loading) return null;
+    if (user) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -24,8 +35,8 @@ export default function LoginPage() {
                 password,
                 totp_code: mfaRequired ? totpCode : undefined
             });
-            // Login successful
-            router.push('/dashboard');
+            // Login successful — redirect based on role
+            // After login, user state is updated, useEffect will handle redirect
         } catch (err: any) {
             if (err.message === 'mfa_required') {
                 setMfaRequired(true);

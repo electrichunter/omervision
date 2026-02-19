@@ -25,7 +25,8 @@ from auth import create_access_token, create_refresh_token, verify_totp, authent
 from security import get_password_hash, verify_password
 from schemas import (
     UserOut, Token, ProjectOut, BlogOut, UserCreate, SubscribeRequest, 
-    RoleCreate, LoginRequest, CommentCreate, CommentOut, NewsletterCreate, NewsletterOut, AuditLogOut
+    RoleCreate, LoginRequest, CommentCreate, CommentOut, NewsletterCreate, NewsletterOut, AuditLogOut,
+    BlogCreate
 )
 import uuid
 from utils import MinioStorage, optimize_image, validate_file_magic
@@ -146,9 +147,14 @@ def check_ip_whitelist(request: Request):
 # RBAC Dependent Logic
 def requires_role(required_role: str):
     async def role_checker(user: User = Depends(get_current_user)):
-        roles = get_user_roles(user)
+        try:
+            roles = [ur.role.slug for ur in user.roles] if user.roles else []
+        except Exception as e:
+            logger.error(f"requires_role: Error extracting roles: {e}")
+            roles = []
+        logger.info(f"requires_role: user={user.username}, roles={roles}, required={required_role}")
         if required_role not in roles:
-            raise HTTPException(status_code=403, detail="Insufficient permissions")
+            raise HTTPException(status_code=403, detail=f"Insufficient permissions. You have: {roles}, need: {required_role}")
         return user
     return role_checker
 
@@ -182,9 +188,10 @@ async def get_current_user(request: Request, authorization: str = Header(None), 
         # Continue if redis fails? Or fail secure? Let's fail secure for now but log it.
         # pass 
 
+    logger.info(f"Decoding token: {token[:10]}...{token[-10:] if len(token)>20 else ''} Length: {len(token)}")
     payload = decode_token(token)
     if not payload or payload.get("type") != "access":
-        logger.warning("get_current_user: Invalid or expired token")
+        logger.warning(f"get_current_user: Invalid or expired token. Payload: {payload}")
         raise HTTPException(status_code=401, detail="Invalid or expired access token")
     
     user_id = payload.get("sub")
@@ -371,6 +378,68 @@ async def get_blogs(cursor: int = None, limit: int = 10, db: AsyncSession = Depe
     
     return blogs
 
+@app.post("/api/blogs", response_model=BlogOut)
+async def create_blog(blog: BlogCreate, db: AsyncSession = Depends(get_db), current: User = Depends(requires_role('admin'))):
+    new_blog = Blog(**blog.model_dump())
+    new_blog.author = current.display_name
+    new_blog.date = datetime.date.today().isoformat()
+    new_blog.href = f"/blog/{blog.slug}"
+    # Calculate reading time (rough estimate: 200 words per minute)
+    word_count = len(blog.content.split())
+    minutes = max(1, round(word_count / 200))
+    new_blog.readingTime = f"{minutes} min read"
+    
+    db.add(new_blog)
+    try:
+        await db.commit()
+        await db.refresh(new_blog)
+        # Invalidate cache
+        # await redis_client.delete("blogs_cNone_l10") # Simple cache invalidation pattern
+        # Improved: Scan and delete keys? For now just let it expire or simple logic.
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+        
+    return new_blog
+
+@app.post("/api/upload")
+async def upload_file(file: UploadFile = File(...), current: User = Depends(requires_role('admin'))):
+    # Validate magic bytes
+    content = await file.read(1024)
+    file_type = validate_file_magic(content) 
+    await file.seek(0)
+    full_content = await file.read()
+    
+    if file_type.startswith("image/"):
+         optimized_content = optimize_image(full_content)
+         filename = f"{uuid.uuid4()}.webp"
+         url = await storage.upload_file(optimized_content, filename, "image/webp")
+    else:
+         filename = f"{uuid.uuid4()}{os.path.splitext(file.filename)[1]}"
+         url = await storage.upload_file(full_content, filename, file_type)
+         
+    return {"url": url}
+
+@app.put("/api/comments/{comment_id}/approve")
+async def approve_comment(comment_id: int, db: AsyncSession = Depends(get_db), current: User = Depends(requires_role('admin'))):
+    result = await db.execute(select(Comment).filter(Comment.id == comment_id))
+    comment = result.scalar_one_or_none()
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    comment.is_approved = True
+    await db.commit()
+    return {"status": "approved"}
+
+@app.delete("/api/comments/{comment_id}")
+async def delete_comment(comment_id: int, db: AsyncSession = Depends(get_db), current: User = Depends(requires_role('admin'))):
+    result = await db.execute(select(Comment).filter(Comment.id == comment_id))
+    comment = result.scalar_one_or_none()
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    await db.delete(comment)
+    await db.commit()
+    return {"status": "deleted"}
+
 # --- Discovery & SEO ---
 
 @app.get("/api/search")
@@ -432,6 +501,17 @@ async def get_skills():
     return []
 
 # --- Engagement & Analytics ---
+
+@app.get("/api/admin/comments", response_model=List[CommentOut])
+async def get_all_comments(status: Optional[str] = None, db: AsyncSession = Depends(get_db), current: User = Depends(requires_role('admin'))):
+    query = select(Comment).options(joinedload(Comment.user)).order_by(Comment.created_at.desc())
+    if status == 'pending':
+        query = query.filter(Comment.is_approved == False)
+    elif status == 'approved':
+        query = query.filter(Comment.is_approved == True)
+        
+    result = await db.execute(query)
+    return result.unique().scalars().all()
 
 @app.get("/api/comments/{post_type}/{post_id}", response_model=List[CommentOut])
 async def get_comments(post_type: str, post_id: int, db: AsyncSession = Depends(get_db)):
@@ -514,7 +594,8 @@ async def get_system_status(current: User = Depends(requires_role('admin'))):
         "cpu": psutil.cpu_percent(),
         "memory": psutil.virtual_memory().percent,
         "disk": psutil.disk_usage('/').percent,
-        "uptime": time.time() - psutil.boot_time()
+        "uptime": time.time() - psutil.boot_time(),
+        "maintenance_mode": redis_client.get("maintenance_mode") == "true"
     }
 
 @app.post("/api/admin/maintenance")
@@ -695,16 +776,17 @@ async def login(req: LoginRequest, request: Request, response: Response, db: Asy
         if not verify_totp(totp_secret, req.totp_code):
             raise HTTPException(status_code=401, detail="Invalid TOTP code")
 
-    # 5. Issue Tokens (Rotation)
-    payload = {"sub": user_id, "roles": user_roles}
-    access_token = create_access_token(payload)
-    refresh_token = create_refresh_token(payload)
+    # Create Token
+    token_payload = {"sub": str(user_id), "roles": user_roles, "type": "access"}
+    logger.info(f"Creating token with payload: {token_payload} (sub type: {type(token_payload['sub'])})")
+    access_token = create_access_token(data=token_payload)
+    refresh_token = create_refresh_token(data=token_payload)
     
     redis_client.set(f"refresh:{user_id}", refresh_token, ex=datetime.timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS))
 
     # Secure Cookie implementation
     response.set_cookie(key="access_token", value=access_token, httponly=True, max_age=15 * 60, samesite="lax", secure=False)
-    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 3600, path="/api/auth/refresh", samesite="lax", secure=False)
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 3600, samesite="lax", secure=False)
     
     await log_audit(db, user_id, "LOGIN", "auth", request)
     return {"status": "success", "roles": user_roles}
@@ -727,20 +809,21 @@ async def refresh_token_route(request: Request, response: Response, db: AsyncSes
         logger.warning(f"Refresh token reuse detected for user {user_id}")
         raise HTTPException(status_code=401, detail="Session expired due to security violation")
 
-    result = await db.execute(select(User).options(joinedload(User.roles)).filter(User.id == user_id))
-    user = result.unique().scalar_one_or_none()
+    result = await db.execute(select(User).options(selectinload(User.roles).selectinload(UserRole.role)).filter(User.id == int(user_id)))
+    user = result.scalar_one_or_none()
     if not user or not user.is_active:
         raise HTTPException(status_code=401, detail="User inactive")
 
     # Issue new pair
-    new_payload = {"sub": user.id, "roles": get_user_roles(user)}
-    new_access = create_access_token(new_payload)
-    new_refresh = create_refresh_token(new_payload)
+    user_roles = [ur.role.slug for ur in user.roles]
+    new_payload = {"sub": str(user.id), "roles": user_roles}
+    new_access = create_access_token(data=new_payload)
+    new_refresh = create_refresh_token(data=new_payload)
     
     redis_client.set(f"refresh:{user.id}", new_refresh, ex=datetime.timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS))
 
-    response.set_cookie(key="access_token", value=new_access, httponly=True, max_age=15 * 60, samesite="lax", secure=True)
-    response.set_cookie(key="refresh_token", value=new_refresh, httponly=True, max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 3600, path="/api/auth/refresh", samesite="lax", secure=True)
+    response.set_cookie(key="access_token", value=new_access, httponly=True, max_age=15 * 60, samesite="lax", secure=False)
+    response.set_cookie(key="refresh_token", value=new_refresh, httponly=True, max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 3600, samesite="lax", secure=False)
     
     return {"status": "refreshed"}
 
@@ -752,7 +835,7 @@ def logout(request: Request, response: Response, user: User = Depends(get_curren
         redis_client.set(f"blacklist:{access_token}", "1", ex=15 * 60)
     
     response.delete_cookie("access_token")
-    response.delete_cookie("refresh_token", path="/api/auth/refresh")
+    response.delete_cookie("refresh_token")
     return {"status": "logged_out"}
 
 # Admin: create user

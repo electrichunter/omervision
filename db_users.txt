@@ -1,0 +1,5 @@
+mysql: [Warning] Using a password on the command line interface can be insecure.
+id	username	email	display_name
+1	omerfaruk	admin@omerfaruk.vision	Ömer Faruk
+2	admin	admin@example.com	Admin User
+4	ouysal155@gmail.com	ouysal155@gmail.com	ouysal155@gmail.com

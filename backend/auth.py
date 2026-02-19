@@ -3,7 +3,7 @@ import pyotp
 from datetime import datetime, timedelta
 from typing import Optional
 
-from jose import jwt
+from jose import jwt, JWTError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from config import settings
@@ -42,15 +42,20 @@ async def authenticate_user(db: AsyncSession, username: str, password: str):
 
 
 def get_user_roles(user: User):
-    roles = [ur.role.name for ur in user.roles] if user and user.roles else []
+    roles = [ur.role.slug for ur in user.roles] if user and user.roles else []
     return roles
 
+
+import logging
+logger = logging.getLogger("api")
 
 def decode_token(token: str):
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         return payload
     except jwt.ExpiredSignatureError:
+        logger.warning("Token expired")
         return None
-    except jwt.InvalidTokenError:
+    except JWTError as e:
+        logger.error(f"JWT Decode Error: {e}")
         return None

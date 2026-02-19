@@ -46,11 +46,20 @@ class ProjectOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class BlogCreate(BaseModel):
+    title: str = Field(..., min_length=5, max_length=200)
+    slug: str = Field(..., min_length=3, max_length=100)
+    image: Optional[str] = None
+    tags: str
+    excerpt: Optional[str] = None
+    content: str
+    featured: bool = False
+
 class BlogOut(BaseModel):
     id: int
     title: str
     slug: Optional[str] = None
-    image: str
+    image: Optional[str] = None
     tags: str
     date: str
     author: str
@@ -96,6 +105,8 @@ class CommentCreate(BaseModel):
 class CommentOut(BaseModel):
     id: int
     user_id: Optional[int]
+    post_id: Optional[int] = None
+    post_type: Optional[str] = None
     content: str
     is_approved: bool
     created_at: datetime.datetime
