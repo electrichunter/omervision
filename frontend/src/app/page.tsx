@@ -15,7 +15,6 @@ export default async function HomePage() {
         <Hero />
         <FeaturedProjects />
         <Skills />
-        <ProjectsGridClient />
         <LatestPosts />
         <ContactCTA />
       </main>

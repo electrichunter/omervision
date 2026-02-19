@@ -8,7 +8,7 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { FadeIn } from "@/components/animation/FadeIn";
-import { projects } from "@/lib/data";
+import { api } from "@/lib/api";
 
 interface ProjectPageProps {
   params: Promise<{
@@ -18,31 +18,24 @@ interface ProjectPageProps {
 
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = projects.find((p) => p.slug === slug);
-  
-  if (!project) {
+  try {
+    const project = await api.getProjectBySlug(slug);
     return {
-      title: "Project Not Found",
+      title: `${project.title} | Full Stack Developer`,
+      description: project.description,
     };
+  } catch (e) {
+    return { title: "Project Not Found" };
   }
-
-  return {
-    title: `${project.title} | Full Stack Developer`,
-    description: project.description,
-  };
-}
-
-export function generateStaticParams() {
-  return projects.map((project) => ({
-    slug: project.slug,
-  }));
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const project = projects.find((p) => p.slug === slug);
 
-  if (!project) {
+  let project;
+  try {
+    project = await api.getProjectBySlug(slug);
+  } catch (e) {
     notFound();
   }
 
@@ -53,8 +46,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         <Container>
           {/* Back link */}
           <FadeIn>
-            <Link 
-              href="/projects" 
+            <Link
+              href="/projects"
               className="inline-flex items-center gap-2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors mb-8"
             >
               <ArrowLeft size={18} />

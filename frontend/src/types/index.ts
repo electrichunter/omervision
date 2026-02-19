@@ -55,3 +55,10 @@ export interface SocialLink {
   href: string;
   icon: string;
 }
+
+export interface SystemStatus {
+  cpu: number;
+  memory: number;
+  disk: number;
+  uptime: number;
+}

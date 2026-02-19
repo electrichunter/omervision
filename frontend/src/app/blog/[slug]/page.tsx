@@ -7,7 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { FadeIn } from "@/components/animation/FadeIn";
-import { blogPosts } from "@/lib/data";
+import { api } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
 
 interface BlogPostPageProps {
@@ -18,31 +18,24 @@ interface BlogPostPageProps {
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
-  
-  if (!post) {
+  try {
+    const post = await api.getBlogBySlug(slug);
     return {
-      title: "Post Not Found",
+      title: `${post.title} | Full Stack Developer`,
+      description: post.excerpt,
     };
+  } catch (e) {
+    return { title: "Post Not Found" };
   }
-
-  return {
-    title: `${post.title} | Full Stack Developer`,
-    description: post.excerpt,
-  };
-}
-
-export function generateStaticParams() {
-  return blogPosts.map((post) => ({
-    slug: post.slug,
-  }));
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
 
-  if (!post) {
+  let post;
+  try {
+    post = await api.getBlogBySlug(slug);
+  } catch (e) {
     notFound();
   }
 
@@ -53,8 +46,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <Container size="md">
           {/* Back link */}
           <FadeIn>
-            <Link 
-              href="/blog" 
+            <Link
+              href="/blog"
               className="inline-flex items-center gap-2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors mb-8"
             >
               <ArrowLeft size={18} />

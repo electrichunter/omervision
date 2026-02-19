@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   description: siteConfig.description,
 };
 
+import { AuthProvider } from "@/hooks/useAuth";
+
 export default function RootLayout({
   children,
 }: {
@@ -22,8 +24,10 @@ export default function RootLayout({
   return (
     <html lang="tr" className="dark">
       <head />
-      <body className={`${inter.variable} font-sans antialiased`}>
-        {children}
+      <body className={`${inter.variable} font-sans antialiased bg-[#0a0a0f] text-white`}>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

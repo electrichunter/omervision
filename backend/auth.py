@@ -1,30 +1,43 @@
 import os
+import pyotp
 from datetime import datetime, timedelta
 from typing import Optional
 
 from jose import jwt
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from config import settings
 from security import get_password_hash, verify_password
 from models import User
 from sqlalchemy.orm import Session
 
-SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE_ME_SECURE_please_change")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
-
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15)) # Short-lived: 15 mins
+    to_encode.update({"exp": expire, "type": "access"})
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
-def authenticate_user(db: Session, username: str, password: str):
-    user = db.query(User).filter(User.username == username).first()
+def create_refresh_token(data: dict) -> str:
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    to_encode.update({"exp": expire, "type": "refresh"})
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+
+def verify_totp(secret: str, code: str) -> bool:
+    totp = pyotp.TOTP(secret)
+    return totp.verify(code)
+
+
+async def authenticate_user(db: AsyncSession, username: str, password: str):
+    result = await db.execute(select(User).filter(User.username == username))
+    user = result.scalar_one_or_none()
     if not user:
-        return None
+        return False
     if not verify_password(password, user.password_hash):
-        return None
+        return False
     return user
 
 
@@ -35,7 +48,7 @@ def get_user_roles(user: User):
 
 def decode_token(token: str):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         return payload
     except jwt.ExpiredSignatureError:
         return None

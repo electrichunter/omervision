@@ -1,30 +1,39 @@
 import os
 from typing import Generator
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.orm import declarative_base
 
 # If DATABASE_URL is not provided, fall back to a local SQLite for development.
 DATABASE_URL = os.getenv("DATABASE_URL", None)
 
 if DATABASE_URL:
-    # Expecting a URL like: mysql+pymysql://user:password@host:3306/dbname
-    engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+    # Use async driver for MySQL
+    ASYNC_DATABASE_URL = DATABASE_URL.replace("mysql+pymysql://", "mysql+aiomysql://")
+    engine = create_async_engine(
+        ASYNC_DATABASE_URL, 
+        pool_pre_ping=True,
+        pool_size=10,
+        max_overflow=20
+    )
 else:
-    # Lightweight fallback for local development without DB setup
-    engine = create_engine("sqlite:///./devportfolio.db", connect_args={"check_same_thread": False})
+    # SQLite async support
+    engine = create_async_engine("sqlite+aiosqlite:///./devportfolio.db", connect_args={"check_same_thread": False})
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+AsyncSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
+SessionLocal = AsyncSessionLocal
 Base = declarative_base()
 
+import redis
+from config import settings
 
-def get_db() -> Generator:
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# Redis Client for Blacklist and Lockout (Keep direct for sync checks if needed, but usually async is better)
+redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
 
+async def get_db() -> Generator:
+    async with AsyncSessionLocal() as session:
+        yield session
 
-def init_db():
-    Base.metadata.create_all(bind=engine)
+async def init_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)

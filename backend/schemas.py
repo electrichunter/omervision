@@ -1,12 +1,13 @@
+import datetime
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, EmailStr
 
 
 class UserCreate(BaseModel):
-    username: str
-    email: str
-    password: str
-    display_name: str
+    username: str = Field(..., min_length=3, max_length=50, pattern="^[a-zA-Z0-9_-]+$")
+    email: EmailStr
+    password: str = Field(..., min_length=8, max_length=128)
+    display_name: str = Field(..., min_length=2, max_length=100)
     roles: List[str] = []
 
 
@@ -29,6 +30,7 @@ class Token(BaseModel):
 class ProjectOut(BaseModel):
     id: int
     title: str
+    slug: str
     image: str
     tags: str
     date: str
@@ -36,12 +38,30 @@ class ProjectOut(BaseModel):
     avatar: Optional[str] = None
     href: str
     excerpt: Optional[str] = None
+    longDescription: Optional[str] = None
+    featured: bool = False
+    category: Optional[str] = None
+    year: Optional[str] = None
 
     model_config = {"from_attributes": True}
 
 
-class BlogOut(ProjectOut):
-    pass
+class BlogOut(BaseModel):
+    id: int
+    title: str
+    slug: str
+    image: str
+    tags: str
+    date: str
+    author: str
+    avatar: Optional[str] = None
+    href: str
+    excerpt: Optional[str] = None
+    content: Optional[str] = None
+    readingTime: Optional[str] = "5 min read"
+    featured: bool = False
+
+    model_config = {"from_attributes": True}
 
 
 class SubscribeRequest(BaseModel):
@@ -53,6 +73,42 @@ class RoleCreate(BaseModel):
     description: Optional[str] = None
 
 
+class AuditLogOut(BaseModel):
+    id: int
+    user_id: Optional[int]
+    action: str
+    target: str
+    ip_address: Optional[str]
+    timestamp: datetime.datetime
+
+    model_config = {"from_attributes": True}
+
+
 class LoginRequest(BaseModel):
     username: str
     password: str
+    totp_code: Optional[str] = None
+class CommentCreate(BaseModel):
+    post_id: int
+    post_type: str = "blog"
+    content: str = Field(..., min_length=1, max_length=1000)
+
+class CommentOut(BaseModel):
+    id: int
+    user_id: Optional[int]
+    content: str
+    is_approved: bool
+    created_at: datetime.datetime
+    user: Optional[UserOut] = None
+
+    model_config = {"from_attributes": True}
+
+class NewsletterCreate(BaseModel):
+    email: EmailStr
+
+class NewsletterOut(BaseModel):
+    email: str
+    is_verified: bool
+    created_at: datetime.datetime
+
+    model_config = {"from_attributes": True}
