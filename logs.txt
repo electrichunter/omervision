@@ -1,0 +1,50 @@
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+  File "/usr/local/lib/python3.10/site-packages/sqlalchemy/orm/context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+  File "/usr/local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1418, in execute
+    return meth(
+  File "/usr/local/lib/python3.10/site-packages/sqlalchemy/sql/elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+  File "/usr/local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+  File "/usr/local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1821, in _execute_context
+    self._handle_dbapi_exception(
+  File "/usr/local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/usr/local/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1815, in _execute_context
+    context = constructor(
+  File "/usr/local/lib/python3.10/site-packages/sqlalchemy/engine/default.py", line 1418, in _init_compiled
+    self.cursor = self.create_cursor()
+  File "/usr/local/lib/python3.10/site-packages/sqlalchemy/engine/default.py", line 1752, in create_cursor
+    return self.create_default_cursor()
+  File "/usr/local/lib/python3.10/site-packages/sqlalchemy/engine/default.py", line 1758, in create_default_cursor
+    return self._dbapi_connection.cursor()
+  File "/usr/local/lib/python3.10/site-packages/sqlalchemy/pool/base.py", line 1485, in cursor
+    return self.dbapi_connection.cursor(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/sqlalchemy/dialects/mysql/aiomysql.py", line 198, in cursor
+    return AsyncAdapt_aiomysql_cursor(self)
+  File "/usr/local/lib/python3.10/site-packages/sqlalchemy/dialects/mysql/aiomysql.py", line 61, in __init__
+    self._cursor = self.await_(cursor.__aenter__())
+  File "/usr/local/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 123, in await_only
+    raise exc.MissingGreenlet(
+sqlalchemy.exc.StatementError: (sqlalchemy.exc.MissingGreenlet) greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place?
+[SQL: SELECT users.id AS users_id, users.username AS users_username, users.email AS users_email, users.password_hash AS users_password_hash, users.display_name AS users_display_name, users.is_active AS users_is_active, users.created_at AS users_created_at, users.totp_secret AS users_totp_secret, users.mfa_enabled AS users_mfa_enabled, users.failed_login_attempts AS users_failed_login_attempts, users.locked_until AS users_locked_until, roles_1.id AS roles_1_id, roles_1.name AS roles_1_name, roles_1.slug AS roles_1_slug, roles_1.description AS roles_1_description, roles_1.is_default AS roles_1_is_default, user_roles_1.user_id AS user_roles_1_user_id, user_roles_1.role_id AS user_roles_1_role_id 
+FROM users LEFT OUTER JOIN user_roles AS user_roles_1 ON users.id = user_roles_1.user_id LEFT OUTER JOIN roles AS roles_1 ON roles_1.id = user_roles_1.role_id 
+WHERE users.id = %s]
+[parameters: [{'pk_1': 4}]]
+(Background on this error at: https://sqlalche.me/e/20/xd2s)
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+{"level": "INFO", "message": "Application shutdown complete.", "timestamp": "2026-02-19 13:44:12,811", "name": "api"}
+INFO:     Application shutdown complete.
+INFO:     Finished server process [589]
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+INFO:     Started server process [646]
+INFO:     Waiting for application startup.
+{"level": "INFO", "message": "Application startup complete with Arq pool.", "timestamp": "2026-02-19 13:44:14,993", "name": "api"}
+INFO:     Application startup complete.
+INFO:     Started server process [654]
+INFO:     Waiting for application startup.
+{"level": "INFO", "message": "Application startup complete with Arq pool.", "timestamp": "2026-02-19 13:44:16,428", "name": "api"}
+INFO:     Application startup complete.

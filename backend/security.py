@@ -7,7 +7,7 @@ ph = PasswordHasher()
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     try:
         return ph.verify(hashed_password, plain_password)
-    except VerifyMismatchError:
+    except (VerifyMismatchError, Exception):
         return False
 
 

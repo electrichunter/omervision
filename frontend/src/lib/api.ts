@@ -3,7 +3,9 @@ import { BlogPost, Project, SystemStatus } from "@/types";
 const isServer = typeof window === 'undefined';
 const API_URL = isServer
   ? (process.env.INTERNAL_API_URL || 'http://backend:8000')
-  : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000');
+  : ''; // Use relative path for client-side to leverage Next.js rewrites
+
+console.log('Configured API_URL:', API_URL);
 
 class ApiClient {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {

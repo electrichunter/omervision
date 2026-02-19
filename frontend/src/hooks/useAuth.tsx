@@ -32,9 +32,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const login = async (credentials: any) => {
-        await api.login(credentials);
-        const u = await api.getCurrentUser();
-        setUser(u);
+        const res: any = await api.login(credentials);
+        if (res.status === 'mfa_required') {
+            throw new Error('mfa_required');
+        }
+        // If login successful, fetch user details immediately
+        try {
+            const u = await api.getCurrentUser();
+            setUser(u);
+        } catch (e) {
+            console.error('Failed to fetch user after login', e);
+        }
     };
 
     const logout = async () => {
@@ -47,11 +55,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value= {{ user, loading, login, logout, hasRole }
-}>
-    { children }
-    </AuthContext.Provider>
-  );
+        <AuthContext.Provider value={{ user, loading, login, logout, hasRole }
+        }>
+            {children}
+        </AuthContext.Provider>
+    );
 }
 
 export function useAuth() {

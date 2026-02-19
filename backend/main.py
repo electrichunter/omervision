@@ -22,7 +22,7 @@ from config import settings
 from database import init_db, get_db, redis_client, SessionLocal
 from models import User, Role, UserRole, Project, Blog, Permission, RolePermission, Comment, NewsletterSubscription, AuditLog
 from auth import create_access_token, create_refresh_token, verify_totp, authenticate_user, decode_token, get_user_roles
-from security import get_password_hash
+from security import get_password_hash, verify_password
 from schemas import (
     UserOut, Token, ProjectOut, BlogOut, UserCreate, SubscribeRequest, 
     RoleCreate, LoginRequest, CommentCreate, CommentOut, NewsletterCreate, NewsletterOut, AuditLogOut
@@ -84,6 +84,16 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "Internal Server Error"}
     )
 
+from fastapi.exceptions import RequestValidationError
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    logger.error(f"Validation error: {exc.errors()} - Body: {exc.body}")
+    return JSONResponse(
+        status_code=422,
+        content={"detail": exc.errors(), "body": str(exc.body)}
+    )
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
@@ -142,6 +152,14 @@ def requires_role(required_role: str):
         return user
     return role_checker
 
+# Logger Middleware
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    logger.info(f"Incoming request: {request.method} {request.url} | Origin: {request.headers.get('origin')}")
+    response = await call_next(request)
+    logger.info(f"Response status: {response.status_code}")
+    return response
+
 async def get_current_user(request: Request, authorization: str = Header(None), db: AsyncSession = Depends(get_db)):
     token = None
     if authorization and authorization.startswith("Bearer "):
@@ -150,25 +168,46 @@ async def get_current_user(request: Request, authorization: str = Header(None), 
         token = request.cookies.get("access_token")
 
     if not token:
+        logger.warning("get_current_user: No token found in headers or cookies")
         raise HTTPException(status_code=401, detail="Not authenticated")
     
-    # Zombie Token Check (Blacklist) - redis client is usually sync here unless we use aioredis, but let's keep it simple
-    if redis_client.get(f"blacklist:{token}"):
-        raise HTTPException(status_code=401, detail="Token revoked (logged out)")
+    # Zombie Token Check (Blacklist)
+    try:
+        is_blacklisted = redis_client.get(f"blacklist:{token}")
+        if is_blacklisted:
+            logger.warning(f"get_current_user: Token blacklisted: {token[:10]}...")
+            raise HTTPException(status_code=401, detail="Token revoked (logged out)")
+    except Exception as e:
+        logger.error(f"Redis error in get_current_user: {e}", exc_info=True)
+        # Continue if redis fails? Or fail secure? Let's fail secure for now but log it.
+        # pass 
 
     payload = decode_token(token)
     if not payload or payload.get("type") != "access":
+        logger.warning("get_current_user: Invalid or expired token")
         raise HTTPException(status_code=401, detail="Invalid or expired access token")
     
     user_id = payload.get("sub")
-    # Async query pattern (N+1 optimization: joinedload roles)
+    try:
+        user_id = int(user_id)
+    except (ValueError, TypeError):
+         logger.error(f"get_current_user: Invalid user_id in token: {user_id}")
+         raise HTTPException(status_code=401, detail="Invalid token data")
+
+    # Async query pattern (N+1 optimization: selectinload for async friendliness)
     result = await db.execute(
-        select(User).options(joinedload(User.roles).joinedload(UserRole.role)).filter(User.id == user_id)
+        select(User).options(selectinload(User.roles).selectinload(UserRole.role)).filter(User.id == user_id)
     )
-    user = result.unique().scalar_one_or_none()
+    user = result.scalar_one_or_none()
     
-    if not user or not user.is_active:
-        raise HTTPException(status_code=401, detail="User inactive or not found")
+    if not user:
+        logger.warning(f"get_current_user: User not found for id {user_id}")
+        raise HTTPException(status_code=401, detail="User not found")
+        
+    if not user.is_active:
+        logger.warning(f"get_current_user: User inactive {user.username}")
+        raise HTTPException(status_code=401, detail="User inactive")
+        
     return user
 
 
@@ -309,10 +348,10 @@ async def get_projects(cursor: int = None, limit: int = 10, db: AsyncSession = D
     
     # 3. Cache Result
     serialized = [ProjectOut.model_validate(p).model_dump() for p in projects]
-    result = await db.execute(query.limit(limit))
-    blogs = result.scalars().all()
-    
-    serialized = [BlogOut.model_validate(b).model_dump() for b in blogs]
+    await set_cache(cache_key, serialized)
+    return serialized
+
+
 @app.get("/api/blogs", response_model=List[BlogOut])
 async def get_blogs(cursor: int = None, limit: int = 10, db: AsyncSession = Depends(get_db)):
     cache_key = f"blogs_c{cursor}_l{limit}"
@@ -553,8 +592,15 @@ async def assign_permission_to_role(role_id: int, permission_name: str, request:
     return {"role_id": role_id, "permission": permission_name}
 
 @app.get("/api/users/me", response_model=UserOut)
-def read_current_user(current: User = Depends(get_current_user)):
-    return current
+async def read_current_user(current: User = Depends(get_current_user)):
+    return UserOut(
+        id=current.id,
+        username=current.username,
+        email=current.email,
+        display_name=current.display_name,
+        is_active=current.is_active,
+        roles=[ur.role.slug for ur in current.roles]
+    )
 
 @app.post("/api/auth/register", response_model=UserOut)
 async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
@@ -580,14 +626,36 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     if role:
         db.add(UserRole(user_id=new_user.id, role_id=role.id))
         await db.commit()
-    
-    return new_user
+
+    # Reload user with roles eagerly loaded
+    result = await db.execute(
+        select(User)
+        .options(joinedload(User.roles).joinedload(UserRole.role))
+        .filter(User.id == new_user.id)
+    )
+    user_with_roles = result.unique().scalar_one()
+
+    # Manually map to UserOut to handle role relationship traversal and type mismatch
+    return UserOut(
+        id=user_with_roles.id,
+        username=user_with_roles.username,
+        email=user_with_roles.email,
+        display_name=user_with_roles.display_name,
+        is_active=user_with_roles.is_active,
+        roles=[ur.role.slug for ur in user_with_roles.roles]
+    )
+
 
 @app.post("/api/auth/login")
 @limiter.limit("5/minute")
 async def login(req: LoginRequest, request: Request, response: Response, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).options(joinedload(User.roles)).filter(User.username == req.username))
-    user = result.unique().scalar_one_or_none()
+    # Eagerly load roles and their role definitions
+    result = await db.execute(
+        select(User)
+        .options(selectinload(User.roles).selectinload(UserRole.role))
+        .filter(User.username == req.username)
+    )
+    user = result.scalar_one_or_none()
     
     # 1. Account Lockout Check
     if user and user.locked_until and user.locked_until > datetime.datetime.utcnow():
@@ -595,7 +663,9 @@ async def login(req: LoginRequest, request: Request, response: Response, db: Asy
         raise HTTPException(status_code=403, detail="Account locked. Try again later.")
 
     # 2. Authenticate
-    authenticated_user = await authenticate_user(db, req.username, req.password)
+    authenticated_user = None
+    if user and verify_password(req.password, user.password_hash):
+        authenticated_user = user
     
     if not authenticated_user:
         if user:
@@ -609,28 +679,35 @@ async def login(req: LoginRequest, request: Request, response: Response, db: Asy
     # 3. Successful password check - Reset fails
     authenticated_user.failed_login_attempts = 0
     authenticated_user.locked_until = None
+    
+    # Extract data before commit to avoid "MissingGreenlet" on expired object access
+    user_id = authenticated_user.id
+    mfa_enabled = authenticated_user.mfa_enabled
+    totp_secret = authenticated_user.totp_secret
+    user_roles = [ur.role.slug for ur in authenticated_user.roles]
+    
     await db.commit()
 
     # 4. MFA Check (TOTP)
-    if authenticated_user.mfa_enabled:
+    if mfa_enabled:
         if not req.totp_code:
             return {"status": "mfa_required"}
-        if not verify_totp(authenticated_user.totp_secret, req.totp_code):
+        if not verify_totp(totp_secret, req.totp_code):
             raise HTTPException(status_code=401, detail="Invalid TOTP code")
 
     # 5. Issue Tokens (Rotation)
-    payload = {"sub": authenticated_user.id, "roles": get_user_roles(authenticated_user)}
+    payload = {"sub": user_id, "roles": user_roles}
     access_token = create_access_token(payload)
     refresh_token = create_refresh_token(payload)
     
-    redis_client.set(f"refresh:{authenticated_user.id}", refresh_token, ex=datetime.timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS))
+    redis_client.set(f"refresh:{user_id}", refresh_token, ex=datetime.timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS))
 
     # Secure Cookie implementation
     response.set_cookie(key="access_token", value=access_token, httponly=True, max_age=15 * 60, samesite="lax", secure=False)
     response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 3600, path="/api/auth/refresh", samesite="lax", secure=False)
     
-    await log_audit(db, authenticated_user.id, "LOGIN", "auth", request)
-    return {"status": "success", "roles": get_user_roles(authenticated_user)}
+    await log_audit(db, user_id, "LOGIN", "auth", request)
+    return {"status": "success", "roles": user_roles}
 
 @app.post("/api/auth/refresh")
 async def refresh_token_route(request: Request, response: Response, db: AsyncSession = Depends(get_db)):

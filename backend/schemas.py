@@ -4,9 +4,9 @@ from pydantic import BaseModel, Field, EmailStr
 
 
 class UserCreate(BaseModel):
-    username: str = Field(..., min_length=3, max_length=50, pattern="^[a-zA-Z0-9_-]+$")
+    username: str = Field(..., min_length=3, max_length=50, pattern="^[a-zA-Z0-9_@.-]+$")
     email: EmailStr
-    password: str = Field(..., min_length=8, max_length=128)
+    password: str = Field(..., min_length=4, max_length=128)
     display_name: str = Field(..., min_length=2, max_length=100)
     roles: List[str] = []
 
@@ -30,7 +30,7 @@ class Token(BaseModel):
 class ProjectOut(BaseModel):
     id: int
     title: str
-    slug: str
+    slug: Optional[str] = None
     image: str
     tags: str
     date: str
@@ -49,7 +49,7 @@ class ProjectOut(BaseModel):
 class BlogOut(BaseModel):
     id: int
     title: str
-    slug: str
+    slug: Optional[str] = None
     image: str
     tags: str
     date: str

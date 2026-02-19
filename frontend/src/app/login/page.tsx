@@ -19,21 +19,19 @@ export default function LoginPage() {
         e.preventDefault();
         setError('');
         try {
-            const res: any = await api.login({
+            await login({
                 username,
                 password,
                 totp_code: mfaRequired ? totpCode : undefined
             });
-
-            if (res.status === 'mfa_required') {
-                setMfaRequired(true);
-                return;
-            }
-
-            // If we got here, login was successful (token set in cookies)
+            // Login successful
             router.push('/dashboard');
         } catch (err: any) {
-            setError(err.message || 'Giriş başarısız');
+            if (err.message === 'mfa_required') {
+                setMfaRequired(true);
+            } else {
+                setError(err.message || 'Giriş başarısız');
+            }
         }
     };
 

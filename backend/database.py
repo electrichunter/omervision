@@ -12,7 +12,7 @@ if DATABASE_URL:
     ASYNC_DATABASE_URL = DATABASE_URL.replace("mysql+pymysql://", "mysql+aiomysql://")
     engine = create_async_engine(
         ASYNC_DATABASE_URL, 
-        pool_pre_ping=True,
+        pool_recycle=3600,
         pool_size=10,
         max_overflow=20
     )
