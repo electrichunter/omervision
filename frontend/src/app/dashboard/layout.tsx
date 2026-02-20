@@ -37,6 +37,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const navItems = [
         { name: 'Genel Bakış', href: '/dashboard', icon: '📊' },
         { name: 'İçerik Yönetimi', href: '/dashboard/content', icon: '📝' },
+        { name: 'Profil & Beceriler', href: '/dashboard/profile', icon: '👤' },
         { name: 'Yorumlar', href: '/dashboard/comments', icon: '💬' },
         { name: 'Ayarlar', href: '/dashboard/settings', icon: '⚙️' },
     ];

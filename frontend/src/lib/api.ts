@@ -89,7 +89,7 @@ class ApiClient {
   }
 
   async getCurrentUser() {
-    return this.request('/api/users/me');
+    return this.request('/api/auth/me');
   }
 
   async logout() {
@@ -125,6 +125,7 @@ class ApiClient {
       readingTime: b.readingTime || "5 min read",
       tags: Array.isArray(b.tags) ? b.tags : (b.tags?.split(',').map((s: string) => s.trim()) || []),
       featured: b.featured || false,
+      is_published: b.is_published !== undefined ? b.is_published : true,
       coverImage: b.image,
     };
   }
@@ -136,8 +137,8 @@ class ApiClient {
     return data.map(this.mapProject);
   }
 
-  async getBlogs(cursor?: number, limit: number = 10): Promise<BlogPost[]> {
-    const url = `/api/blogs?limit=${limit}${cursor ? `&cursor=${cursor}` : ''}`;
+  async getBlogs(cursor?: number, limit: number = 10, includeDrafts: boolean = false): Promise<BlogPost[]> {
+    const url = `/api/blogs?limit=${limit}${cursor ? `&cursor=${cursor}` : ''}${includeDrafts ? '&include_drafts=true' : ''}`;
     const data = await this.request<any[]>(url);
     return data.map(this.mapBlogPost);
   }
@@ -149,6 +150,11 @@ class ApiClient {
 
   async getBlogBySlug(slug: string): Promise<BlogPost> {
     const data = await this.request<any>(`/api/blogs/${slug}`);
+    return this.mapBlogPost(data);
+  }
+
+  async getBlogById(id: string): Promise<BlogPost> {
+    const data = await this.request<any>(`/api/blogs/id/${id}`);
     return this.mapBlogPost(data);
   }
 
@@ -194,6 +200,14 @@ class ApiClient {
     return this.mapBlogPost(res);
   }
 
+  async updateBlog(id: string, data: any): Promise<BlogPost> {
+    const res = await this.request<any>(`/api/blogs/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+    return this.mapBlogPost(res);
+  }
+
   async getComments(postType: string, postId: number) {
     return this.request<any>(`/api/comments/${postType}/${postId}`);
   }
@@ -213,6 +227,18 @@ class ApiClient {
 
   async toggleMaintenance(enable: boolean) {
     return this.request(`/api/admin/maintenance?enable=${enable}`, { method: 'POST' });
+  }
+
+  async deleteBlog(id: string) {
+    return this.request(`/api/blogs/${id}`, { method: 'DELETE' });
+  }
+
+  async toggleBlogPublish(id: string) {
+    return this.request(`/api/blogs/${id}/toggle-publish`, { method: 'POST' });
+  }
+
+  async getHealth() {
+    return this.request<{ status: string; service: string; maintenance: boolean }>('/api/health');
   }
 }
 

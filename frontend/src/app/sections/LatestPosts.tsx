@@ -49,7 +49,7 @@ export function LatestPosts() {
           {posts.map((post, index) => (
             <FadeIn key={post.id} delay={index * 0.1}>
               <Link href={`/blog/${post.slug}`}>
-                <article className="group h-full flex flex-col bg-[var(--color-bg-primary)] rounded-2xl overflow-hidden border border-[var(--color-border)] hover:border-[var(--color-border-hover)] transition-colors">
+                <article className="group h-full flex flex-col card overflow-hidden">
                   <div className="relative aspect-[16/9] overflow-hidden bg-[var(--color-bg-tertiary)]">
                     {post.coverImage ? (
                       <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />

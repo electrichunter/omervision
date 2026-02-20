@@ -54,6 +54,7 @@ class BlogCreate(BaseModel):
     excerpt: Optional[str] = None
     content: str
     featured: bool = False
+    is_published: bool = True
 
 class BlogOut(BaseModel):
     id: int
@@ -69,6 +70,7 @@ class BlogOut(BaseModel):
     content: Optional[str] = None
     readingTime: Optional[str] = "5 min read"
     featured: bool = False
+    is_published: bool = True
 
     model_config = {"from_attributes": True}
 

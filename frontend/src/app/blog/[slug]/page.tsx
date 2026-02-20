@@ -97,10 +97,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
           {/* Content */}
           <FadeIn delay={0.3}>
-            <article className="prose prose-invert prose-lg max-w-none">
-              <div className="text-[var(--color-text-secondary)] whitespace-pre-line">
-                {post.content}
-              </div>
+            <article className="prose prose-slate prose-lg max-w-none">
+              <div
+                className="text-[var(--color-text-secondary)]"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
             </article>
           </FadeIn>
         </Container>

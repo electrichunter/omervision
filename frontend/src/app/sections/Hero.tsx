@@ -16,10 +16,12 @@ const socialLinks = [
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-20 pb-16 overflow-hidden">
-      {/* Background glow */}
+    <section className="relative min-h-screen flex items-center justify-center pt-20 pb-16 overflow-hidden bg-mesh">
+      {/* Subtle dot grid overlay */}
+      <div className="absolute inset-0 bg-dot-grid opacity-40 pointer-events-none" />
+      {/* Radial top glow */}
       <div className="absolute inset-0 bg-radial-glow pointer-events-none" />
-      
+
       <Container className="relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
@@ -28,8 +30,8 @@ export function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...springPresets.gentle, delay: 0.1 }}
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-secondary)] mb-8">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="inline-flex items-center gap-2 mb-8 badge-accent">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_6px_theme(colors.emerald.400)] animate-pulse" />
               Available for freelance work
             </span>
           </motion.div>
@@ -53,7 +55,7 @@ export function Hero() {
             transition={{ ...springPresets.gentle, delay: 0.3 }}
             className="text-lg sm:text-xl text-[var(--color-text-secondary)] max-w-2xl mx-auto mb-10"
           >
-            Building digital experiences with modern technologies. Focused on performance, 
+            Building digital experiences with modern technologies. Focused on performance,
             accessibility, and beautiful design.
           </motion.p>
 
@@ -94,7 +96,7 @@ export function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ ...springPresets.gentle, delay: 0.5 + index * 0.1 }}
                 whileHover={{ scale: 1.1, y: -2 }}
-                className="p-3 rounded-xl bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] transition-colors"
+                className="p-3 rounded-xl card text-[var(--color-text-secondary)] hover:text-[var(--color-accent-blue)] transition-colors"
                 aria-label={social.label}
               >
                 <social.icon size={20} />
@@ -114,9 +116,9 @@ export function Hero() {
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-          className="w-6 h-10 rounded-full border-2 border-[var(--color-border)] flex items-start justify-center p-2"
+          className="w-6 h-10 rounded-full border-2 border-[var(--color-border-hover)] flex items-start justify-center p-2 bg-white/60 backdrop-blur"
         >
-          <motion.div className="w-1 h-2 rounded-full bg-[var(--color-text-muted)]" />
+          <motion.div className="w-1 h-2 rounded-full bg-[var(--color-accent-blue)]" />
         </motion.div>
       </motion.div>
     </section>

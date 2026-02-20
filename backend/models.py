@@ -102,6 +102,7 @@ class Blog(Base):
     content = Column(Text)
     readingTime = Column(String(50))
     featured = Column(Boolean, default=False)
+    is_published = Column(Boolean, default=True)
 
     __table_args__ = (
         Index('ix_blog_fulltext', 'title', 'excerpt', mysql_prefix='FULLTEXT'),

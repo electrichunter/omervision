@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -9,12 +9,18 @@ import { navigation } from "@/lib/constants";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { springPresets } from "@/lib/animations";
 import { SearchModal } from "./SearchModal";
-import { Search } from "lucide-react";
+import { Search, Info } from "lucide-react";
+import { api } from "@/lib/api";
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMaintenance, setIsMaintenance] = useState(false);
   const { scrollDirection, scrollY } = useScrollDirection();
+
+  useEffect(() => {
+    api.getHealth().then(data => setIsMaintenance(data.maintenance)).catch(() => { });
+  }, []);
 
   const isScrolled = scrollY > 20;
   const isHidden = scrollDirection === "down" && scrollY > 100;
@@ -26,15 +32,25 @@ export function Navigation() {
         y: isHidden ? -100 : 0,
       }}
       transition={springPresets.smooth}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "glass" : "bg-transparent"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
+          ? 'bg-white/80 backdrop-blur-xl border-b border-[var(--color-border)] shadow-sm'
+          : 'bg-transparent'
         }`}
     >
       <Container>
         <nav className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link href="/" className="text-xl font-bold text-[var(--color-text-primary)]">
-            Portfolio
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="text-xl font-bold text-[var(--color-text-primary)]">
+              Portfolio
+            </Link>
+            {isMaintenance && (
+              <span className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 animate-pulse">
+                <Info size={12} />
+                Bakımdayız
+              </span>
+            )}
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">

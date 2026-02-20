@@ -74,6 +74,8 @@ class MinioStorage:
             )
             return f"http://{settings.MINIO_PUBLIC_ENDPOINT}/{self.bucket}/{filename}"
 
+storage = MinioStorage()
+
 def get_cdn_url(path: str) -> str:
     """Prepends MinIO or CDN domain to asset paths."""
     if path.startswith("http"): return path

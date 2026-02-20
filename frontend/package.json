@@ -9,6 +9,13 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@tiptap/extension-bubble-menu": "^3.20.0",
+    "@tiptap/extension-floating-menu": "^3.20.0",
+    "@tiptap/extension-image": "^3.20.0",
+    "@tiptap/extension-link": "^3.20.0",
+    "@tiptap/extension-placeholder": "^3.20.0",
+    "@tiptap/react": "^3.20.0",
+    "@tiptap/starter-kit": "^3.20.0",
     "@tremor/react": "^3.18.7",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
@@ -18,7 +25,6 @@
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-quill": "^2.0.0",
     "tailwind-merge": "^2.6.1"
   },
   "devDependencies": {

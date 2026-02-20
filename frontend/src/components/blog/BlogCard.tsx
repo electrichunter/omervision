@@ -13,7 +13,7 @@ interface BlogCardProps {
 export function BlogCard({ post }: BlogCardProps) {
   return (
     <Link href={`/blog/${post.slug}`}>
-      <article className="group flex flex-col md:flex-row gap-6 p-6 rounded-2xl bg-[var(--color-bg-secondary)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] transition-colors">
+      <article className="group flex flex-col md:flex-row gap-6 p-6 rounded-2xl bg-white border border-[var(--color-border)] hover:border-[var(--color-border-hover)] hover:shadow-md transition-all duration-200">
         {/* Image */}
         <div className="w-full md:w-48 h-32 md:h-auto flex-shrink-0 rounded-xl overflow-hidden bg-[var(--color-bg-tertiary)] flex items-center justify-center text-[var(--color-text-muted)] text-sm">
           {post.title}
@@ -55,8 +55,8 @@ export function BlogCard({ post }: BlogCardProps) {
 
         {/* Arrow */}
         <div className="hidden md:flex items-center">
-          <ArrowUpRight 
-            size={24} 
+          <ArrowUpRight
+            size={24}
             className="text-[var(--color-text-muted)] group-hover:text-[var(--color-accent-blue)] transition-colors"
           />
         </div>

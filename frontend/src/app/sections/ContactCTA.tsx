@@ -3,42 +3,46 @@
 import Link from "next/link";
 import { ArrowRight, Mail } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
 import { FadeIn } from "@/components/animation/FadeIn";
 import { siteConfig } from "@/lib/constants";
 
 export function ContactCTA() {
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-24 md:py-32 bg-[var(--color-bg-primary)]">
       <Container>
         <FadeIn>
-          <div className="relative bg-gradient-to-br from-[var(--color-bg-secondary)] to-[var(--color-bg-tertiary)] rounded-3xl p-8 md:p-16 text-center overflow-hidden">
-            {/* Background glow */}
-            <div className="absolute inset-0 bg-radial-glow opacity-50" />
-            
-            <div className="relative z-10 max-w-2xl mx-auto">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--color-text-primary)] mb-6">
-                Let&apos;s work together
-              </h2>
-              
-              <p className="text-lg text-[var(--color-text-secondary)] mb-10">
-                Have a project in mind? I&apos;d love to hear about it. Let&apos;s discuss how we can bring your ideas to life.
-              </p>
+          <div className="max-w-2xl mx-auto text-center">
+            {/* Divider line */}
+            <div className="flex items-center gap-4 mb-12">
+              <div className="flex-1 h-px bg-[var(--color-border)]" />
+              <span className="text-xs font-semibold tracking-widest uppercase text-[var(--color-text-muted)]">İletişim</span>
+              <div className="flex-1 h-px bg-[var(--color-border)]" />
+            </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href={`mailto:${siteConfig.links.email}`}>
-                  <Button size="lg" className="gap-2">
-                    <Mail size={18} />
-                    Get in Touch
-                  </Button>
-                </Link>
-                <Link href="/projects">
-                  <Button variant="outline" size="lg" className="gap-2">
-                    View Projects
-                    <ArrowRight size={18} />
-                  </Button>
-                </Link>
-              </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-[var(--color-text-primary)] mb-5 leading-tight">
+              Birlikte bir şeyler<br />
+              <span className="text-[var(--color-accent-blue)]">üretelim.</span>
+            </h2>
+
+            <p className="text-lg text-[var(--color-text-secondary)] mb-10 max-w-lg mx-auto">
+              Aklınızda bir proje mi var? Fikirlerinizi hayata geçirmek için konuşalım.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                href={`mailto:${siteConfig.links.email}`}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-text-primary)] text-white rounded-xl font-medium text-sm hover:opacity-90 transition-opacity shadow-lg shadow-black/10"
+              >
+                <Mail size={17} />
+                E-posta Gönder
+              </Link>
+              <Link
+                href="/projects"
+                className="inline-flex items-center gap-2 px-6 py-3 border border-[var(--color-border)] text-[var(--color-text-secondary)] rounded-xl font-medium text-sm hover:border-[var(--color-border-hover)] hover:text-[var(--color-text-primary)] transition-colors bg-white"
+              >
+                Projeleri İncele
+                <ArrowRight size={17} />
+              </Link>
             </div>
           </div>
         </FadeIn>

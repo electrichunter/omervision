@@ -17,12 +17,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
       <motion.article
         whileHover={{ y: -4 }}
         transition={springPresets.gentle}
-        className="group relative bg-[var(--color-bg-secondary)] rounded-2xl overflow-hidden border border-[var(--color-border)] hover:border-[var(--color-border-hover)] transition-colors"
+        className="group relative bg-white border border-[var(--color-border)] rounded-2xl overflow-hidden hover:shadow-lg hover:border-[var(--color-border-hover)] transition-all duration-300"
       >
         {/* Image */}
         <div className="relative aspect-video overflow-hidden">
-          <div className="absolute inset-0 bg-[var(--color-bg-tertiary)] flex items-center justify-center text-[var(--color-text-muted)]">
-            <span className="text-sm">{project.title}</span>
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-bg-secondary)] to-[var(--color-bg-tertiary)] flex items-center justify-center text-[var(--color-text-muted)]">
+            <span className="text-sm font-medium">{project.title}</span>
           </div>
           <div className="absolute inset-0 bg-[var(--color-accent-blue)]/10 opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
@@ -38,12 +38,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 {project.title}
               </h2>
             </div>
-            <ArrowUpRight 
-              size={20} 
+            <ArrowUpRight
+              size={20}
               className="text-[var(--color-text-muted)] group-hover:text-[var(--color-accent-blue)] transition-colors flex-shrink-0 mt-1"
             />
           </div>
-          
+
           <p className="text-[var(--color-text-secondary)] mb-4 line-clamp-2">
             {project.description}
           </p>

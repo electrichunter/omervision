@@ -25,6 +25,7 @@ export interface BlogPost {
   tags: string[];
   featured: boolean;
   coverImage?: string;
+  is_published?: boolean;
 }
 
 export interface Skill {

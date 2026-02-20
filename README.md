@@ -1,20 +1,23 @@
-# Omervision 🚀
+# OmerVision
 
-Modern, ölçeklenebilir ve rol tabanlı bir içerik yönetim sistemi.
+Kişisel portföy ve blog sitesi. Next.js frontend, FastAPI backend, MySQL ve Redis.
 
-## 📚 Dokümantasyon
-
-Projenin mimarisi, kullanılan teknolojiler ve detaylı görsel anlatımı için lütfen aşağıdaki dokümanı inceleyin:
-
-👉 **[Teknoloji Mimarisi ve Detaylar](doc/teknolojiler.md)**
-
-## 🛠 Hızlı Başlangıç
-
-Docker ile projeyi ayağa kaldırmak için:
+## Başlangıç
 
 ```bash
 docker-compose up --build
 ```
 
-- **Frontend:** [http://localhost:3000](http://localhost:3000)
-- **Backend API:** [http://localhost:8000/docs](http://localhost:8000/docs)
+| Servis | URL |
+|---|---|
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:8000/docs |
+| Admin Panel | http://localhost:3000/dashboard |
+
+## Stack
+
+- **Frontend:** Next.js 15, Tailwind CSS v4, Framer Motion
+- **Backend:** FastAPI, SQLAlchemy, Redis
+- **Veritabanı:** MySQL 8
+- **Storage:** MinIO
+- **Deploy:** Docker Compose

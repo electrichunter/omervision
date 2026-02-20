@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "lucide-react": "^0.564.0",
-    "react-quill": "^2.0.0",
-    "@tremor/react": "^2.0.0"
-  }
-}

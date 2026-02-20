@@ -20,7 +20,7 @@ else:
     # SQLite async support
     engine = create_async_engine("sqlite+aiosqlite:///./devportfolio.db", connect_args={"check_same_thread": False})
 
-AsyncSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
+AsyncSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession, expire_on_commit=False)
 SessionLocal = AsyncSessionLocal
 Base = declarative_base()
 
