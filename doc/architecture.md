@@ -19,7 +19,7 @@ OmerVision, bir Full Stack geliştirici portföy platformudur. İki temel katman
                       │ :3000
                       ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              FRONTEND — Next.js 14 (App Router)             │
+│              FRONTEND — Next.js 16 (App Router)             │
 │  - SSR + Client Components                                  │
 │  - Tailwind CSS + Framer Motion                             │
 │  - /dashboard/* (yönetici paneli)                           │
@@ -116,7 +116,7 @@ OmerVision, bir Full Stack geliştirici portföy platformudur. İki temel katman
 ### Frontend
 | Teknoloji | Versiyon | Amaç |
 |---|---|---|
-| Next.js | 15.x | React SSR çatısı |
+| Next.js | 16.x | React SSR çatısı |
 | Tailwind CSS | 4.x | Utility-first CSS |
 | Framer Motion | latest | Animasyonlar |
 | Lucide React | latest | İkon seti |

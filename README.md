@@ -30,7 +30,7 @@ docker compose up --build -d
 
 | Katman | Teknoloji | Sürüm |
 |---|---|---|
-| **Frontend** | Next.js | 15.x |
+| **Frontend** | Next.js | 16.x |
 | **Frontend** | Tailwind CSS | 4.x |
 | **Frontend** | Framer Motion | latest |
 | **Backend** | FastAPI | 0.129.0 |
