@@ -117,7 +117,7 @@ docker logs blog_frontend --tail 50
 
 ### MySQL'e bağlanamıyorum
 ```bash
-docker exec blog_mysql mysqladmin -u root -prootpassword ping
+docker exec blog_mysql mysqladmin -u root -p$MYSQL_ROOT_PASSWORD ping
 ```
 
 ### PaaS modülü Docker image build edemiyor

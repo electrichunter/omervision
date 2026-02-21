@@ -293,7 +293,45 @@ CMD ["./main"]"""
 
 ---
 
-## 4. Geliştirme Akışı Özeti
+## 4. PaaS Modülü: Lokal Debugging İş Akışı
+
+PaaS motoru, backend konteyneri içinden Docker socket'e erişerek çalışır. Sorun çıktığında şu adımları izleyin:
+
+### Adım 1: Docker Socket Kontrolü
+Backend'in Docker ile konuşabildiğinden emin olun:
+```bash
+docker exec blog_backend docker ps
+```
+
+### Adım 2: Deployment Loglarını İzleme
+Bir proje deployment aşamasındayken (deploying), backend loglarını canlı takip edin:
+```bash
+docker logs blog_backend -f
+```
+Burada git clone, docker build ve docker run çıktılarını görebilirsiniz.
+
+### Adım 3: Oluşturulan İmajları Kontrol Etme
+PaaS projesi build edildiğinde bir imaj oluşturulur (örn: `paas_app_5`):
+```bash
+docker images | grep paas_app
+```
+
+### Adım 4: Geçici Çalışma Alanını İnceleme
+Projeler backend içindeki `/tmp/paas_projects/project_<id>` klasörüne klonlanır. Kodun doğru inip inmediğini kontrol etmek için:
+```bash
+docker exec -it blog_backend ls -la /tmp/paas_projects/project_<id>
+```
+
+### Adım 5: Port Çakışmalarını Kontrol Etme
+PaaS motoru boş bir port arar (`find_available_port`). Eğer bir proje "running" görünüyor ama açılmıyorsa:
+```bash
+docker ps --filter "name=paas_app"
+```
+Burada hangi iç portun (container port) hangi dış porta (host port) bağlandığını teyit edin.
+
+---
+
+## 5. Geliştirme Akışı Özeti
 
 ```
 1. Özellik Branch Oluştur
