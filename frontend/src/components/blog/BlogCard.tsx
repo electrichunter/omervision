@@ -15,8 +15,12 @@ export function BlogCard({ post }: BlogCardProps) {
     <Link href={`/blog/${post.slug}`}>
       <article className="group flex flex-col md:flex-row gap-6 p-6 rounded-2xl bg-white border border-[var(--color-border)] hover:border-[var(--color-border-hover)] hover:shadow-md transition-all duration-200">
         {/* Image */}
-        <div className="w-full md:w-48 h-32 md:h-auto flex-shrink-0 rounded-xl overflow-hidden bg-[var(--color-bg-tertiary)] flex items-center justify-center text-[var(--color-text-muted)] text-sm">
-          {post.title}
+        <div className="w-full md:w-64 aspect-[16/9] flex-shrink-0 rounded-xl overflow-hidden bg-[var(--color-bg-tertiary)] flex items-center justify-center text-[var(--color-text-muted)] text-sm relative">
+          {post.coverImage ? (
+            <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover absolute inset-0" />
+          ) : (
+            <span className="p-4 text-center">{post.title}</span>
+          )}
         </div>
 
         {/* Content */}
@@ -29,7 +33,7 @@ export function BlogCard({ post }: BlogCardProps) {
             </span>
             <span className="flex items-center gap-1">
               <Clock size={14} />
-              {post.readingTime}
+              {post.readingTime} min read
             </span>
           </div>
 

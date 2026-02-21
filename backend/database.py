@@ -1,8 +1,12 @@
 import os
+import asyncio
+import logging
 from typing import Generator
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
+
+logger = logging.getLogger("api")
 
 # If DATABASE_URL is not provided, fall back to a local SQLite for development.
 DATABASE_URL = os.getenv("DATABASE_URL", None)
@@ -35,5 +39,20 @@ async def get_db() -> Generator:
         yield session
 
 async def init_db():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    """Initialize database with retries to handle startup delay."""
+    retries = 10
+    retry_interval = 3
+    
+    while retries > 0:
+        try:
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            logger.info("Database initialized successfully.")
+            return
+        except Exception as e:
+            retries -= 1
+            if retries == 0:
+                logger.error(f"Failed to initialize database after multiple retries: {e}")
+                raise e
+            logger.warning(f"Database connection failed, retrying in {retry_interval}s... ({retries} retries left): {e}")
+            await asyncio.sleep(retry_interval)

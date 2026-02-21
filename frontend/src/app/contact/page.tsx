@@ -43,7 +43,7 @@ export default function ContactPage() {
                                         </div>
                                         <div>
                                             <h3 className="font-semibold mb-1">Social</h3>
-                                            <p className="text-[var(--color-text-secondary)]">Available on LinkedIn and Twitter</p>
+                                            <p className="text-[var(--color-text-secondary)]">LinkedIn üzerinden ulaşabilirsiniz</p>
                                         </div>
                                     </div>
                                 </div>

@@ -33,7 +33,7 @@ class ProjectOut(BaseModel):
     slug: Optional[str] = None
     image: str
     tags: str
-    date: str
+    date: datetime.datetime
     author: str
     avatar: Optional[str] = None
     href: str
@@ -47,8 +47,8 @@ class ProjectOut(BaseModel):
 
 
 class BlogCreate(BaseModel):
-    title: str = Field(..., min_length=5, max_length=200)
-    slug: str = Field(..., min_length=3, max_length=100)
+    title: str = Field(..., min_length=1, max_length=200)
+    slug: str = Field(..., min_length=1, max_length=100)
     image: Optional[str] = None
     tags: str
     excerpt: Optional[str] = None
@@ -62,13 +62,13 @@ class BlogOut(BaseModel):
     slug: Optional[str] = None
     image: Optional[str] = None
     tags: str
-    date: str
+    date: datetime.datetime
     author: str
     avatar: Optional[str] = None
     href: str
     excerpt: Optional[str] = None
     content: Optional[str] = None
-    readingTime: Optional[str] = "5 min read"
+    readingTime: Optional[int] = 5
     featured: bool = False
     is_published: bool = True
 
@@ -123,5 +123,32 @@ class NewsletterOut(BaseModel):
     email: str
     is_verified: bool
     created_at: datetime.datetime
+
+    model_config = {"from_attributes": True}
+
+class PaaSProjectCreate(BaseModel):
+    repo_url: str
+    name: str
+    description: Optional[str] = None
+
+class PaaSProjectUpdate(BaseModel):
+    repo_url: Optional[str] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+
+class PaaSProjectOut(BaseModel):
+    id: int
+    user_id: Optional[int]
+    repo_url: str
+    name: str
+    description: Optional[str] = None
+    status: str
+    project_type: Optional[str]
+    port: Optional[int]
+    container_id: Optional[str]
+    host_url: Optional[str]
+    logs: Optional[str]
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
 
     model_config = {"from_attributes": True}

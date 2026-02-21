@@ -15,7 +15,7 @@ from models import User, Role, UserRole, Project, Blog
 from security import get_password_hash
 
 # Import Routers
-from routers import auth, blogs, projects, admin, public, comments, upload
+from routers import auth, blogs, projects, admin, public, comments, upload, paas
 
 # SlowAPI Initialization
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -110,6 +110,7 @@ app.include_router(admin.router)
 app.include_router(comments.router)
 app.include_router(upload.router)
 app.include_router(public.router)
+app.include_router(paas.router)
 
 # --- Events ---
 @app.on_event("shutdown")

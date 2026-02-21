@@ -68,7 +68,7 @@ export function LatestPosts() {
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock size={14} />
-                        {post.readingTime}
+                        {post.readingTime} min read
                       </span>
                     </div>
 

@@ -2,20 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Github, Activity } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { FadeIn } from "@/components/animation/FadeIn";
-import { ProjectCard } from "@/components/projects/ProjectCard";
-import { api } from "@/lib/api";
-import { Project } from "@/types";
+import { api, PaaSProject } from "@/lib/api";
+import { motion } from "framer-motion";
+import { springPresets } from "@/lib/animations";
 
 export function FeaturedProjects() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<PaaSProject[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.getProjects(undefined, 6)
-      .then(res => setProjects(res.filter(p => p.featured)))
+    api.getPublicPaaSProjects()
+      .then(res => setProjects(res.slice(0, 4)))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -29,16 +29,16 @@ export function FeaturedProjects() {
         <FadeIn className="mb-16">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
-              <h2 className="text-[var(--color-text-primary)] mb-4 font-bold text-3xl">Featured Projects</h2>
+              <h2 className="text-[var(--color-text-primary)] mb-4 font-bold text-3xl">Canlı Projelerim</h2>
               <p className="text-[var(--color-text-secondary)] max-w-2xl text-lg">
-                A selection of my recent work. Each project represents a unique challenge and solution.
+                Kendi izole VDS sunucumda barındırdığım ve yönettiğim en son web uygulamaları ve projelerim.
               </p>
             </div>
             <Link
               href="/projects"
-              className="text-[var(--color-accent-blue)] hover:text-[var(--color-accent-blue)]/80 font-medium inline-flex items-center gap-1 transition-colors group"
+              className="text-blue-500 hover:text-blue-400 font-medium inline-flex items-center gap-1 transition-colors group"
             >
-              View all projects
+              Tüm projeleri gör
               <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </Link>
           </div>
@@ -47,7 +47,42 @@ export function FeaturedProjects() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {projects.map((project, index) => (
             <FadeIn key={project.id} delay={index * 0.1}>
-              <ProjectCard project={project} />
+              <Link href={`/paas/${project.id}`}>
+                <motion.article
+                  whileHover={{ y: -4 }}
+                  transition={springPresets.gentle}
+                  className="group relative bg-[#0a0a0f] border border-white/5 rounded-2xl overflow-hidden hover:shadow-lg hover:shadow-blue-900/10 hover:border-blue-500/30 transition-all duration-300 h-full flex flex-col"
+                >
+                  {/* Placeholder Banner */}
+                  <div className="relative aspect-video overflow-hidden border-b border-white/5">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-950/40 to-black flex flex-col items-center justify-center text-gray-500 gap-3">
+                      <Activity size={32} className={project.status === "running" ? "text-emerald-500" : "text-blue-500 animate-pulse"} />
+                      <span className="text-lg font-medium text-gray-300 px-4 text-center line-clamp-1">{project.name}</span>
+                    </div>
+                    <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-6 flex-1 flex flex-col">
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div>
+                        <span className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1 block">
+                          {project.project_type || 'Uygulama'} • {project.status === 'running' ? 'Yayında' : 'Dağıtılıyor'}
+                        </span>
+                        <h2 className="text-xl font-semibold text-gray-200 group-hover:text-blue-400 transition-colors">
+                          {project.name}
+                        </h2>
+                      </div>
+                      <ArrowUpRight size={20} className="text-gray-600 group-hover:text-blue-400 transition-colors flex-shrink-0 mt-1" />
+                    </div>
+                    <p className="text-gray-400 mb-6 text-sm flex-1">{project.description || "Bu proje için bir açıklama girilmemiş."}</p>
+                    <div className="flex items-center gap-2 pt-4 border-t border-white/5 text-gray-500 text-xs">
+                      <Github size={14} />
+                      <span className="truncate max-w-[250px]">{project.repo_url.replace("https://github.com/", "")}</span>
+                    </div>
+                  </div>
+                </motion.article>
+              </Link>
             </FadeIn>
           ))}
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Github, Twitter, Linkedin, Mail, MapPin, CheckCircle } from "lucide-react";
+import { Github, Linkedin, Mail, MapPin, CheckCircle } from "lucide-react";
 import { Navigation } from "@/components/layout/Navigation";
 import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
@@ -21,6 +21,7 @@ interface AboutData {
   linkedin: string;
   available: boolean;
   avatar: string;
+  avatarPosition?: string;
 }
 
 export default function AboutPage() {
@@ -89,12 +90,6 @@ export default function AboutPage() {
                         <Github size={20} />
                       </a>
                     )}
-                    {about?.twitter && (
-                      <a href={about.twitter} target="_blank" rel="noopener noreferrer"
-                        className="p-3 rounded-xl bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] transition-colors">
-                        <Twitter size={20} />
-                      </a>
-                    )}
                     {about?.linkedin && (
                       <a href={about.linkedin} target="_blank" rel="noopener noreferrer"
                         className="p-3 rounded-xl bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] transition-colors">
@@ -113,9 +108,9 @@ export default function AboutPage() {
 
               {/* Avatar / Image */}
               <FadeIn delay={0.2}>
-                <div className="relative aspect-square rounded-3xl overflow-hidden bg-[var(--color-bg-secondary)] border border-[var(--color-border)] flex items-center justify-center">
+                <div className="relative aspect-square rounded-full overflow-hidden bg-[var(--color-bg-secondary)] border-2 border-[var(--color-border)] flex items-center justify-center w-full max-w-[380px] mx-auto shadow-2xl">
                   {about?.avatar ? (
-                    <img src={about.avatar} alt={about.name} className="w-full h-full object-cover" />
+                    <img src={about.avatar} alt={about.name || 'Avatar'} className={`w-full h-full object-cover ${about?.avatarPosition || 'object-center'}`} />
                   ) : (
                     <div className="flex flex-col items-center gap-3 text-[var(--color-text-muted)]">
                       <div className="w-24 h-24 rounded-full bg-[var(--color-bg-tertiary)] flex items-center justify-center text-5xl font-bold text-[var(--color-text-secondary)]">

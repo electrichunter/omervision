@@ -1,9 +1,47 @@
 import datetime
+import base64
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Index, Text, BigInteger
 from sqlalchemy.dialects.mysql import INTEGER as MYSQL_INTEGER
 from sqlalchemy.orm import relationship
+from sqlalchemy.types import TypeDecorator
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.backends import default_backend
 from database import Base
+from config import settings
 
+kdf = PBKDF2HMAC(
+    algorithm=hashes.SHA256(),
+    length=32,
+    salt=b'omervision-salt-totp',
+    iterations=100000,
+    backend=default_backend()
+)
+_fernet_key = base64.urlsafe_b64encode(kdf.derive(settings.SECRET_KEY.encode('utf-8')))
+fernet = Fernet(_fernet_key)
+
+class EncryptedString(TypeDecorator):
+    """Encrypts string variables on the way in and decrypts them on the way out."""
+    impl = String
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        return dialect.type_descriptor(String(255))
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            return fernet.encrypt(value.encode('utf-8')).decode('utf-8')
+        return None
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            try:
+                return fernet.decrypt(value.encode('utf-8')).decode('utf-8')
+            except Exception:
+                # Fallback in case there's old non-encrypted data
+                return value
+        return None
 
 class User(Base):
     __tablename__ = 'users'
@@ -16,7 +54,7 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
     
     # 2FA / Security
-    totp_secret = Column(String(32), nullable=True)
+    totp_secret = Column(EncryptedString, nullable=True)
     mfa_enabled = Column(Boolean, default=False)
     failed_login_attempts = Column(Integer, default=0)
     locked_until = Column(DateTime, nullable=True)
@@ -72,7 +110,7 @@ class Project(Base):
     slug = Column(String(200), unique=True, index=True)
     image = Column(String(255))
     tags = Column(String(255))  # comma-separated
-    date = Column(String(20))
+    date = Column(DateTime, default=datetime.datetime.utcnow, index=True)
     author = Column(String(100))
     avatar = Column(String(255))
     href = Column(String(255))
@@ -94,13 +132,13 @@ class Blog(Base):
     slug = Column(String(200), unique=True, index=True)
     image = Column(String(255))
     tags = Column(String(255))  # comma-separated
-    date = Column(String(20))
+    date = Column(DateTime, default=datetime.datetime.utcnow, index=True)
     author = Column(String(100))
     avatar = Column(String(255))
     href = Column(String(255))
     excerpt = Column(String(500))
     content = Column(Text)
-    readingTime = Column(String(50))
+    readingTime = Column(Integer, default=5)
     featured = Column(Boolean, default=False)
     is_published = Column(Boolean, default=True)
 
@@ -137,3 +175,21 @@ class AuditLog(Base):
     target = Column(String(100), nullable=False)  # e.g., 'projects:12'
     ip_address = Column(String(45), nullable=True)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+
+class PaaSProject(Base):
+    __tablename__ = 'paas_projects'
+    id = Column(MYSQL_INTEGER(unsigned=True), primary_key=True, index=True, autoincrement=True)
+    user_id = Column(MYSQL_INTEGER(unsigned=True), ForeignKey('users.id'), nullable=True)
+    repo_url = Column(String(255), nullable=False)
+    name = Column(String(100), nullable=False)
+    description = Column(String(500))
+    status = Column(String(20), default="pending")  # pending, deploying, running, failed, stopped
+    project_type = Column(String(50))  # nextjs, fastapi, static
+    port = Column(Integer, nullable=True)
+    container_id = Column(String(100), nullable=True)
+    host_url = Column(String(255), nullable=True)
+    logs = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    
+    user = relationship('User')

@@ -21,7 +21,7 @@ export interface BlogPost {
   excerpt: string;
   content: string;
   date: string;
-  readingTime: string;
+  readingTime: number;
   tags: string[];
   featured: boolean;
   coverImage?: string;

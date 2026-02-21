@@ -38,6 +38,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { name: 'Genel Bakış', href: '/dashboard', icon: '📊' },
         { name: 'İçerik Yönetimi', href: '/dashboard/content', icon: '📝' },
         { name: 'Profil & Beceriler', href: '/dashboard/profile', icon: '👤' },
+        { name: 'Projeler (PaaS)', href: '/dashboard/paas', icon: '🚀' },
         { name: 'Yorumlar', href: '/dashboard/comments', icon: '💬' },
         { name: 'Ayarlar', href: '/dashboard/settings', icon: '⚙️' },
     ];

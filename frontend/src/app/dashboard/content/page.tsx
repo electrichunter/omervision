@@ -97,9 +97,9 @@ export default function ContentListPage() {
                             className={`flex flex-col sm:flex-row gap-6 p-5 rounded-2xl border transition-all ${blog.is_published ? 'bg-white/[0.02] border-white/5 hover:border-white/10' : 'bg-orange-500/5 border-orange-500/20 hover:border-orange-500/40'}`}
                         >
                             {/* Image Placeholder / Thumbnail */}
-                            <div className="w-full sm:w-48 h-32 rounded-xl bg-[#111] overflow-hidden shrink-0 border border-white/5 relative">
+                            <div className="w-full sm:w-48 aspect-[16/9] sm:aspect-auto rounded-xl bg-[#111] overflow-hidden shrink-0 border border-white/5 relative flex items-center justify-center">
                                 {blog.coverImage ? (
-                                    <img src={blog.coverImage} className="w-full h-full object-cover" alt={blog.title} />
+                                    <img src={blog.coverImage} className="w-full h-full object-cover absolute inset-0" alt={blog.title} />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-700 font-mono text-xs">
                                         No Image
@@ -131,7 +131,7 @@ export default function ContentListPage() {
                                 <div className="flex flex-wrap items-center justify-between gap-4">
                                     <div className="flex items-center gap-4 text-xs font-medium text-gray-500">
                                         <span className="flex items-center gap-1.5"><Calendar size={14} /> {formatDate(blog.date)}</span>
-                                        <span className="px-2 py-1 rounded bg-white/5 border border-white/10">{blog.readingTime}</span>
+                                        <span className="px-2 py-1 rounded bg-white/5 border border-white/10">{blog.readingTime} min read</span>
                                     </div>
 
                                     <div className="flex items-center gap-2">

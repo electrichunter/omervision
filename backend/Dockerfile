@@ -3,7 +3,7 @@ FROM python:3.10-slim
 
 # Gerekli sistem paketlerini yükle (magic numara kontrolü için libmagic-dev)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libmagic-dev \
+    libmagic-dev git docker.io \
     && rm -rf /var/lib/apt/lists/*
 
 # Çalışma dizini
@@ -22,7 +22,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 RUN chown -R appuser /app
 
-USER appuser
+# Güvenlik ve Socket Yetkesi için root kalması PaaS operasyonlarında gereklidir
+USER root
 
 # FastAPI'yi başlat (Hot-reload açık)
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

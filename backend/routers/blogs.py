@@ -37,11 +37,11 @@ async def get_blogs(cursor: int = None, limit: int = 10, include_drafts: bool = 
 async def create_blog(blog: BlogCreate, db: AsyncSession = Depends(get_db), current: User = Depends(requires_role('admin'))):
     new_blog = Blog(**blog.model_dump())
     new_blog.author = current.display_name
-    new_blog.date = datetime.date.today().isoformat()
+    new_blog.date = datetime.datetime.utcnow()
     new_blog.href = f"/blog/{blog.slug}"
     word_count = len(blog.content.split())
     minutes = max(1, round(word_count / 200))
-    new_blog.readingTime = f"{minutes} min read"
+    new_blog.readingTime = minutes
     
     db.add(new_blog)
     try:
@@ -89,7 +89,7 @@ async def update_blog(blog_id: int, blog: BlogCreate, request: Request, db: Asyn
     
     word_count = len(blog.content.split())
     minutes = max(1, round(word_count / 200))
-    existing_blog.readingTime = f"{minutes} min read"
+    existing_blog.readingTime = minutes
     
     try:
         await db.commit()

@@ -2,6 +2,7 @@ import json
 import logging
 from typing import List
 from fastapi import Request, Depends, HTTPException, Header
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -19,7 +20,7 @@ async def get_cache(key: str):
     return json.loads(data) if data else None
 
 async def set_cache(key: str, data: any, expire: int = 300):
-    redis_client.set(f"cache:{key}", json.dumps(data), ex=expire)
+    redis_client.set(f"cache:{key}", json.dumps(jsonable_encoder(data)), ex=expire)
 
 def invalidate_blog_cache():
     try:

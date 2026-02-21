@@ -78,7 +78,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock size={16} />
-                  {post.readingTime}
+                  {post.readingTime} min read
                 </span>
               </div>
             </header>
@@ -88,9 +88,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {post.coverImage && (
             <FadeIn delay={0.2}>
               <div className="relative aspect-video rounded-2xl overflow-hidden bg-[var(--color-bg-secondary)] border border-[var(--color-border)] mb-12">
-                <div className="absolute inset-0 flex items-center justify-center text-[var(--color-text-muted)]">
-                  {post.title}
-                </div>
+                <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
               </div>
             </FadeIn>
           )}

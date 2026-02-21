@@ -7,7 +7,6 @@ export const siteConfig = {
   ogImage: "/og-image.jpg",
   links: {
     github: "https://github.com/electrichunter",
-    twitter: "https://twitter.com",
     linkedin: "https://www.linkedin.com/in/omer-farukuysal/",
     email: "ouysal155@gmail.com",
   },
@@ -25,7 +24,6 @@ export const navigation = [
 export const socialLinks = [
   { name: "GitHub", href: siteConfig.links.github, icon: "Github" },
   { name: "LinkedIn", href: siteConfig.links.linkedin, icon: "Linkedin" },
-  { name: "Twitter", href: siteConfig.links.twitter, icon: "Twitter" },
 ];
 
 // Footer links

@@ -149,7 +149,7 @@ export const blogPosts: BlogPost[] = [
       performance of your application.
     `,
     date: "2024-01-15",
-    readingTime: "8 min read",
+    readingTime: 8,
     tags: ["React", "Next.js", "Performance"],
     featured: true,
     coverImage: "/images/blog/react-patterns.jpg",
@@ -172,7 +172,7 @@ export const blogPosts: BlogPost[] = [
       Template literal types bring the power of string manipulation to TypeScript's type system.
     `,
     date: "2024-01-08",
-    readingTime: "6 min read",
+    readingTime: 6,
     tags: ["TypeScript", "JavaScript"],
     featured: true,
     coverImage: "/images/blog/typescript.jpg",
@@ -195,7 +195,7 @@ export const blogPosts: BlogPost[] = [
       Good documentation is crucial for adoption. Invest in tools like Storybook to showcase your components.
     `,
     date: "2023-12-20",
-    readingTime: "10 min read",
+    readingTime: 10,
     tags: ["Design Systems", "UI/UX", "React"],
     featured: true,
     coverImage: "/images/blog/design-systems.jpg",
@@ -217,7 +217,7 @@ export const blogPosts: BlogPost[] = [
       Images are often the largest assets on a page. Use modern formats and lazy loading techniques.
     `,
     date: "2023-12-10",
-    readingTime: "7 min read",
+    readingTime: 7,
     tags: ["Performance", "Web Vitals"],
     featured: false,
     coverImage: "/images/blog/performance.jpg",
@@ -240,7 +240,7 @@ export const blogPosts: BlogPost[] = [
       Sometimes the simplest solution is the best. Don't over-engineer your state management.
     `,
     date: "2023-11-28",
-    readingTime: "9 min read",
+    readingTime: 9,
     tags: ["React", "State Management"],
     featured: false,
     coverImage: "/images/blog/state-management.jpg",

@@ -29,6 +29,7 @@ interface AboutData {
     linkedin: string;
     available: boolean;
     avatar: string;
+    avatarPosition?: string;
 }
 
 const COLORS = [
@@ -147,6 +148,22 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploadingAvatar(true);
+        try {
+            const res = await api.uploadFile(file);
+            setAbout({ ...about, avatar: res.url });
+        } catch (err) {
+            alert('Avatar resmi yüklenemedi');
+            console.error(err);
+        } finally {
+            setUploadingAvatar(false);
+        }
+    };
 
     useEffect(() => {
         Promise.all([
@@ -250,7 +267,6 @@ export default function ProfilePage() {
                         { label: "GitHub URL", key: "github", placeholder: "https://github.com/..." },
                         { label: "Twitter URL", key: "twitter", placeholder: "https://twitter.com/..." },
                         { label: "LinkedIn URL", key: "linkedin", placeholder: "https://linkedin.com/in/..." },
-                        { label: "Avatar URL", key: "avatar", placeholder: "https://..." },
                     ].map(f => (
                         <div key={f.key} className="bg-white border border-[var(--color-border)] rounded-2xl p-4">
                             <label className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-2 block">{f.label}</label>
@@ -262,6 +278,44 @@ export default function ProfilePage() {
                             />
                         </div>
                     ))}
+
+                    {/* Avatar Upload */}
+                    <div className="bg-white border border-[var(--color-border)] rounded-2xl p-4 flex flex-col justify-center">
+                        <label className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-2 block">Avatar (Profil Resmi) - Dairesel Önizleme</label>
+                        <div className="flex items-center gap-4">
+                            {about.avatar ? (
+                                <img src={about.avatar} alt="Avatar" className={`w-24 h-24 rounded-full object-cover ${about.avatarPosition || 'object-center'} border border-gray-200 shadow-sm`} />
+                            ) : (
+                                <div className="w-24 h-24 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center">
+                                    <User size={30} className="text-gray-400" />
+                                </div>
+                            )}
+                            <label className="inline-flex items-center gap-2 text-[var(--color-accent-blue)] hover:bg-blue-50 cursor-pointer transition-colors px-3 py-1.5 rounded-lg border border-blue-100 text-sm font-medium">
+                                {uploadingAvatar ? "Yükleniyor..." : "Dosya Seç"}
+                                <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" disabled={uploadingAvatar} />
+                            </label>
+                            {about.avatar && (
+                                <button onClick={() => setAbout({ ...about, avatar: '' })} className="text-xs text-red-500 hover:text-red-600 font-medium ml-2">Kaldır</button>
+                            )}
+                        </div>
+                        {about.avatar && (
+                            <div className="mt-6 border-t border-[var(--color-border)] pt-4">
+                                <label className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-2 block">Görselin Odak Noktası</label>
+                                <p className="text-xs text-gray-400 mb-3">Kare olmayan fotoğrafların yuvarlak / dikey çerçeveye sığdırılırken neresine odaklanılacağını seçin.</p>
+                                <select
+                                    className="bg-white/[0.05] border border-white/10 text-gray-200 text-sm rounded-lg focus:ring-[var(--color-accent-blue)] focus:border-[var(--color-accent-blue)] outline-none block w-full p-2.5 transition-colors"
+                                    value={about.avatarPosition || 'object-center'}
+                                    onChange={(e) => setAbout({ ...about, avatarPosition: e.target.value })}
+                                >
+                                    <option value="object-center" className="text-gray-800">Merkez (Ortala)</option>
+                                    <option value="object-top" className="text-gray-800">Üst</option>
+                                    <option value="object-bottom" className="text-gray-800">Alt</option>
+                                    <option value="object-left" className="text-gray-800">Sol</option>
+                                    <option value="object-right" className="text-gray-800">Sağ</option>
+                                </select>
+                            </div>
+                        )}
+                    </div>
 
                     {/* Bio */}
                     <div className="lg:col-span-2 bg-white border border-[var(--color-border)] rounded-2xl p-4">

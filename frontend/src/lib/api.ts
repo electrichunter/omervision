@@ -1,5 +1,19 @@
 import { BlogPost, Project, SystemStatus } from "@/types";
 
+export interface PaaSProject {
+  id: number;
+  repo_url: string;
+  name: string;
+  description: string | null;
+  status: string;
+  project_type: string | null;
+  port: number | null;
+  container_id: string | null;
+  host_url: string | null;
+  logs: string | null;
+  created_at: string;
+}
+
 const isServer = typeof window === 'undefined';
 const API_URL = isServer
   ? (process.env.INTERNAL_API_URL || 'http://backend:8000')
@@ -12,6 +26,7 @@ class ApiClient {
   private async makeRequest(endpoint: string, options: RequestInit = {}): Promise<Response> {
     const url = `${API_URL}${endpoint}`;
     return fetch(url, {
+      cache: 'no-store',
       ...options,
       headers: {
         'Content-Type': 'application/json',
@@ -122,7 +137,7 @@ class ApiClient {
       excerpt: b.excerpt || "",
       content: b.content || "",
       date: b.date || new Date().toISOString(),
-      readingTime: b.readingTime || "5 min read",
+      readingTime: typeof b.readingTime === 'number' ? b.readingTime : (parseInt(b.readingTime) || 5),
       tags: Array.isArray(b.tags) ? b.tags : (b.tags?.split(',').map((s: string) => s.trim()) || []),
       featured: b.featured || false,
       is_published: b.is_published !== undefined ? b.is_published : true,
@@ -239,6 +254,45 @@ class ApiClient {
 
   async getHealth() {
     return this.request<{ status: string; service: string; maintenance: boolean }>('/api/health');
+  }
+
+  // PaaS Project API
+  async createPaaSProject(data: { repo_url: string; name: string; description?: string }): Promise<PaaSProject> {
+    return this.request<PaaSProject>('/api/paas', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getPaaSProjects(): Promise<PaaSProject[]> {
+    return this.request<PaaSProject[]>('/api/paas');
+  }
+
+  async getPublicPaaSProjects(): Promise<PaaSProject[]> {
+    return this.request<PaaSProject[]>('/api/paas/projects');
+  }
+
+  async getPaaSProject(id: number): Promise<PaaSProject> {
+    return this.request<PaaSProject>(`/api/paas/${id}`);
+  }
+
+  async stopPaaSProject(id: number) {
+    return this.request(`/api/paas/${id}/stop`, { method: 'POST' });
+  }
+
+  async startPaaSProject(id: number) {
+    return this.request(`/api/paas/${id}/start`, { method: 'POST' });
+  }
+
+  async deletePaaSProject(id: number) {
+    return this.request(`/api/paas/${id}`, { method: 'DELETE' });
+  }
+
+  async updatePaaSProject(id: number, data: { name?: string; repo_url?: string; description?: string }): Promise<PaaSProject> {
+    return this.request<PaaSProject>(`/api/paas/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
   }
 }
 

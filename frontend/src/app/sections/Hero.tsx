@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Github, Linkedin, Twitter } from "lucide-react";
+import { ArrowRight, Github, Linkedin } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { siteConfig } from "@/lib/constants";
@@ -10,7 +10,6 @@ import { springPresets } from "@/lib/animations";
 
 const socialLinks = [
   { icon: Github, href: siteConfig.links.github, label: "GitHub" },
-  { icon: Twitter, href: siteConfig.links.twitter, label: "Twitter" },
   { icon: Linkedin, href: siteConfig.links.linkedin, label: "LinkedIn" },
 ];
 

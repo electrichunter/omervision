@@ -8,7 +8,7 @@ import json
 import hashlib
 
 from database import get_db, redis_client
-from models import Blog, Project, NewsletterSubscription
+from models import Blog, Project, NewsletterSubscription, PaaSProject
 from schemas import SubscribeRequest, NewsletterCreate
 from config import settings
 
@@ -140,3 +140,11 @@ async def track_view_count(post_type: str, post_id: int, request: Request):
 async def get_og_image_endpoint_route(title: str):
     from utils import generate_og_image
     return Response(content=generate_og_image(title), media_type="image/webp")
+
+@router.get("/paas/projects")
+async def get_public_paas_projects(db: AsyncSession = Depends(get_db)):
+    # Only return projects that are in running or deploying status
+    result = await db.execute(
+        select(PaaSProject).filter(PaaSProject.status.in_(["running", "deploying"])).order_by(PaaSProject.created_at.desc())
+    )
+    return result.scalars().all()

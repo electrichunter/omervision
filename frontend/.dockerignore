@@ -1,0 +1,15 @@
+node_modules/
+.next/
+out/
+build/
+.npm
+.yarn
+
+# Ide environments
+.vscode/
+.idea/
+
+# Database mounts etc
+data/
+db/
+*.sql

@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { Github, Twitter, Linkedin } from "lucide-react";
+import { Github, Linkedin } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { siteConfig, footerLinks } from "@/lib/constants";
 
 const socialIcons = {
   Github,
-  Twitter,
   Linkedin,
 };
 
