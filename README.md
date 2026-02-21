@@ -63,6 +63,10 @@ Detaylı teknik dökümantasyon için [`doc/`](./doc/) klasörüne bakın:
 | [Çevre Değişkenleri](./doc/environment.md) | Ortam değişkenleri referans tablosu |
 | [Servisler & Portlar](./doc/services.md) | Tüm endpoint ve URL listesi |
 | [Geliştirici İş Akışı](./doc/developer-workflow.md) | Model, sayfa ve PaaS geliştirme rehberi |
+| [Canlıya Alma Rehberi](./doc/deployment.md) | VPS, Nginx ve SSL kurulumu |
+| [Test Otomasyonu](./doc/testing.md) | Pytest ve Jest testleri |
+| [Veritabanı Yönetimi](./doc/database.md) | Şema yönetimi ve yedekleme |
+| [API Referansı](./doc/api-reference.md) | Auth akışı ve mimari mantık |
 
 ---
 
