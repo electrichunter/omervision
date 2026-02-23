@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
-from sqlalchemy import text
+from sqlalchemy import text, or_
 import json
 import hashlib
 
@@ -20,12 +20,22 @@ async def search_content(q: str, db: AsyncSession = Depends(get_db)):
     if not q:
         return {"blogs": [], "projects": []}
     
-    if "mysql" in settings.DATABASE_URL.lower():
-        blog_q = select(Blog).filter(text("MATCH(title, excerpt) AGAINST(:query IN NATURAL LANGUAGE MODE)")).params(query=q)
-        proj_q = select(Project).filter(text("MATCH(title, excerpt) AGAINST(:query IN NATURAL LANGUAGE MODE)")).params(query=q)
-    else:
-        blog_q = select(Blog).filter(Blog.title.ilike(f"%{q}%"))
-        proj_q = select(Project).filter(Project.title.ilike(f"%{q}%"))
+    # Use standard LIKE for better reliability across all setups
+    blog_q = select(Blog).filter(
+        or_(
+            Blog.title.ilike(f"%{q}%"),
+            Blog.excerpt.ilike(f"%{q}%"),
+            Blog.author.ilike(f"%{q}%")
+        )
+    ).filter(Blog.is_published == True)
+    
+    proj_q = select(Project).filter(
+        or_(
+            Project.title.ilike(f"%{q}%"),
+            Project.excerpt.ilike(f"%{q}%"),
+            Project.category.ilike(f"%{q}%")
+        )
+    )
 
     blog_res = await db.execute(blog_q)
     proj_res = await db.execute(proj_q)

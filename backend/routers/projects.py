@@ -17,9 +17,9 @@ async def get_projects(cursor: int = None, limit: int = 10, db: AsyncSession = D
     if cached:
         return cached
 
-    query = select(Project).order_by(Project.id.asc())
+    query = select(Project).order_by(Project.id.desc())
     if cursor:
-        query = query.filter(Project.id > cursor)
+        query = query.filter(Project.id < cursor)
     
     result = await db.execute(query.limit(limit))
     projects = result.scalars().all()

@@ -96,7 +96,7 @@ export default function DashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
             >
-                <h2 className="text-lg font-bold mb-4 text-gray-300">Hızlı İşlemler</h2>
+                <h2 className="text-lg font-bold mb-4 text-[var(--color-text-secondary)]">Hızlı İşlemler</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {quickActions.map((action) => (
                         <button
@@ -105,8 +105,8 @@ export default function DashboardPage() {
                             className={`text-left p-6 rounded-2xl bg-gradient-to-br ${action.gradient} border ${action.border} ${action.hoverBg} transition-all duration-300 group hover:shadow-lg`}
                         >
                             <span className="text-3xl block mb-3 group-hover:scale-110 transition-transform duration-200">{action.icon}</span>
-                            <h3 className="font-bold text-white mb-1">{action.label}</h3>
-                            <p className="text-sm text-gray-400">{action.desc}</p>
+                            <h1 className="text-xl font-bold text-white mb-1">{action.label}</h1>
+                            <p className="text-sm text-gray-100 opacity-70">{action.desc}</p>
                         </button>
                     ))}
                 </div>
@@ -124,10 +124,10 @@ function MetricCard({ icon, label, value, color, loading }: { icon: string, labe
     };
 
     return (
-        <div className={`p-5 rounded-2xl bg-white/[0.03] border ${colorMap[color]} shadow-lg transition-all hover:bg-white/[0.05] group`}>
+        <div className={`p-5 rounded-2xl bg-[var(--color-bg-secondary)] border ${colorMap[color]} shadow-lg transition-all hover:bg-[var(--color-bg-tertiary)] group`}>
             <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg">{icon}</span>
-                <p className="text-[11px] text-gray-500 uppercase tracking-widest font-bold">{label}</p>
+                <p className="text-[11px] text-[var(--color-text-muted)] uppercase tracking-widest font-bold">{label}</p>
             </div>
             {loading ? (
                 <div className="h-8 w-20 bg-white/5 rounded-lg animate-pulse" />

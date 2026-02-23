@@ -11,6 +11,7 @@ import { springPresets } from "@/lib/animations";
 import { SearchModal } from "./SearchModal";
 import { Search, Info } from "lucide-react";
 import { api } from "@/lib/api";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,8 +34,8 @@ export function Navigation() {
       }}
       transition={springPresets.smooth}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
-          ? 'bg-white/80 backdrop-blur-xl border-b border-[var(--color-border)] shadow-sm'
-          : 'bg-transparent'
+        ? 'bg-[var(--color-bg-primary)]/80 backdrop-blur-xl border-b border-[var(--color-border)] shadow-sm'
+        : 'bg-transparent'
         }`}
     >
       <Container>
@@ -64,6 +65,8 @@ export function Navigation() {
               </Link>
             ))}
 
+            <ThemeToggle />
+
             <button
               onClick={() => setIsSearchOpen(true)}
               className="p-2 ml-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors rounded-lg hover:bg-[var(--color-bg-tertiary)]"
@@ -75,6 +78,7 @@ export function Navigation() {
 
           {/* Mobile Menu Button */}
           <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
             <button
               onClick={() => setIsSearchOpen(true)}
               className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"

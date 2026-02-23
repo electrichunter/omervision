@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { FadeIn } from "@/components/animation/FadeIn";
 import { api } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
+import { VoicePlayer } from "@/components/ui/VoicePlayer";
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -51,7 +52,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               className="inline-flex items-center gap-2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors mb-8"
             >
               <ArrowLeft size={18} />
-              Back to blog
+              Blog'a dön
             </Link>
           </FadeIn>
 
@@ -78,7 +79,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock size={16} />
-                  {post.readingTime} min read
+                  {post.readingTime} dk okuma
                 </span>
               </div>
             </header>
@@ -92,6 +93,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </div>
             </FadeIn>
           )}
+
+          {/* AI Voice Player */}
+          <VoicePlayer content={post.content} title={post.title} />
 
           {/* Content */}
           <FadeIn delay={0.3}>

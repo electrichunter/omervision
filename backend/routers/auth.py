@@ -16,8 +16,15 @@ from config import settings
 logger = logging.getLogger("api")
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
+from security import get_password_hash, verify_password, validate_password
+
 @router.post("/register", response_model=UserOut)
 async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
+    try:
+        hashed_pw = get_password_hash(user.password)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
     result = await db.execute(select(User).filter((User.username == user.username) | (User.email == user.email)))
     if result.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Username or email already registered")
@@ -25,7 +32,7 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     new_user = User(
         username=user.username,
         email=user.email,
-        password_hash=get_password_hash(user.password),
+        password_hash=hashed_pw,
         display_name=user.display_name,
         is_active=True
     )
@@ -123,6 +130,8 @@ async def refresh_token_route(request: Request, response: Response, db: AsyncSes
     stored_token = redis_client.get(f"refresh:{user_id}")
     if stored_token != refresh_token:
         redis_client.delete(f"refresh:{user_id}")
+        from auth import revoke_token
+        revoke_token(refresh_token, 7 * 24 * 3600)  # blacklist leaked refresh token
         raise HTTPException(status_code=401, detail="Session expired due to security violation")
 
     result = await db.execute(select(User).options(selectinload(User.roles).selectinload(UserRole.role)).filter(User.id == int(user_id)))
@@ -155,10 +164,70 @@ async def read_current_user(current: User = Depends(get_current_user)):
 
 @router.post("/logout")
 def logout(request: Request, response: Response, user: User = Depends(get_current_user)):
-    access_token = request.cookies.get("access_token")
+    authorization = request.headers.get("Authorization")
+    if authorization and authorization.startswith("Bearer "):
+        access_token = authorization.split(" ")[1]
+    else:
+        access_token = request.cookies.get("access_token")
+        
     if access_token:
-        redis_client.set(f"blacklist:{access_token}", "1", ex=15 * 60)
+        from auth import revoke_token
+        revoke_token(access_token)
     
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
     return {"status": "logged_out"}
+
+# MFA & Security
+from schemas import MFASetupResponse, PasswordChangeRequest
+from auth import generate_totp_secret, get_totp_uri
+
+@router.post("/mfa/setup", response_model=MFASetupResponse)
+async def setup_mfa(current: User = Depends(get_current_user)):
+    secret = generate_totp_secret()
+    uri = get_totp_uri(secret, current.username)
+    return MFASetupResponse(secret=secret, qr_code_uri=uri)
+
+@router.post("/mfa/enable")
+async def enable_mfa(req: dict, request: Request, db: AsyncSession = Depends(get_db), current: User = Depends(get_current_user)):
+    secret = req.get("secret")
+    code = req.get("code")
+    if not secret or not code:
+         raise HTTPException(status_code=400, detail="Secret and code required")
+    
+    if verify_totp(secret, code):
+        current.totp_secret = secret
+        current.mfa_enabled = True
+        await db.commit()
+        await log_audit(db, current.id, "MFA_ENABLED", "auth", request)
+        return {"status": "success"}
+    else:
+        raise HTTPException(status_code=400, detail="Invalid verification code")
+
+@router.post("/mfa/disable")
+async def disable_mfa(req: dict, request: Request, db: AsyncSession = Depends(get_db), current: User = Depends(get_current_user)):
+    code = req.get("code")
+    if not code:
+         raise HTTPException(status_code=400, detail="MFA code required to disable")
+    
+    if verify_totp(current.totp_secret, code):
+        current.mfa_enabled = False
+        current.totp_secret = None
+        await db.commit()
+        await log_audit(db, current.id, "MFA_DISABLED", "auth", request)
+        return {"status": "success"}
+    else:
+        raise HTTPException(status_code=400, detail="Invalid verification code")
+
+@router.post("/password/change")
+async def change_password(req: PasswordChangeRequest, request: Request, db: AsyncSession = Depends(get_db), current: User = Depends(get_current_user)):
+    if not verify_password(req.old_password, current.password_hash):
+        raise HTTPException(status_code=400, detail="Old password incorrect")
+    
+    try:
+        current.password_hash = get_password_hash(req.new_password)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    await db.commit()
+    await log_audit(db, current.id, "PASSWORD_CHANGED", "auth", request)
+    return {"status": "success"}

@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     ALLOWED_ADMIN_IPS: List[str] = ["127.0.0.1", "::1"]
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     TOTP_ISSUER: str = "OmerVision"
+    ADMIN_USERNAME: str = "admin"
+    ADMIN_PASSWORD: str
     
     model_config = SettingsConfigDict(
         env_file=".env", 

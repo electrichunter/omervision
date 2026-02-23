@@ -15,7 +15,7 @@ from models import User, Role, UserRole, Project, Blog
 from security import get_password_hash
 
 # Import Routers
-from routers import auth, blogs, projects, admin, public, comments, upload, paas
+from routers import auth, blogs, projects, admin, public, comments, upload, paas, tts
 
 # SlowAPI Initialization
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -33,8 +33,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],
 )
 
 # Structured Logging Setup
@@ -111,6 +111,7 @@ app.include_router(comments.router)
 app.include_router(upload.router)
 app.include_router(public.router)
 app.include_router(paas.router)
+app.include_router(tts.router)
 
 # --- Events ---
 @app.on_event("shutdown")
@@ -136,12 +137,12 @@ async def startup_event():
                 db.add_all([admin, editor, viewer])
                 await db.commit()
             
-            res = await db.execute(select(User).filter(User.username == 'admin'))
+            res = await db.execute(select(User).filter(User.username == settings.ADMIN_USERNAME))
             if not res.scalar_one_or_none():
                 admin_user = User(
-                    username='admin', 
+                    username=settings.ADMIN_USERNAME, 
                     email='admin@example.com', 
-                    password_hash=get_password_hash('Admin@123'), 
+                    password_hash=get_password_hash(settings.ADMIN_PASSWORD), 
                     display_name='Admin User', 
                     is_active=True
                 )

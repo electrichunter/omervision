@@ -64,3 +64,13 @@ export interface SystemStatus {
   uptime: number;
   maintenance_mode?: boolean;
 }
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  display_name: string;
+  is_active: boolean;
+  mfa_enabled: boolean;
+  roles: string[];
+}

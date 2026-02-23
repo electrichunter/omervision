@@ -35,11 +35,9 @@ COPY . .
 
 
 # Portu dışarı aç
-
 EXPOSE 3000
 
-
+USER node
 
 # Uygulamayı başlat
-
 CMD ["npm", "run", "dev"]

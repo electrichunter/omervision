@@ -30,6 +30,12 @@ def verify_totp(secret: str, code: str) -> bool:
     totp = pyotp.TOTP(secret)
     return totp.verify(code)
 
+def generate_totp_secret() -> str:
+    return pyotp.random_base32()
+
+def get_totp_uri(secret: str, username: str) -> str:
+    return pyotp.totp.TOTP(secret).provisioning_uri(name=username, issuer_name="OmerVision")
+
 
 async def authenticate_user(db: AsyncSession, username: str, password: str):
     result = await db.execute(select(User).filter(User.username == username))
@@ -59,3 +65,21 @@ def decode_token(token: str):
     except JWTError as e:
         logger.error(f"JWT Decode Error: {e}")
         return None
+
+from database import redis_client
+
+def revoke_token(token: str, expire_seconds: int = 900):
+    """Add token to blocklist for immediate revocation."""
+    if token:
+        redis_client.set(f"blacklist:{token}", "1", ex=expire_seconds)
+
+def is_token_revoked(token: str) -> bool:
+    """Check if a token has been explicitly revoked."""
+    if not token:
+        return False
+    try:
+        return bool(redis_client.get(f"blacklist:{token}"))
+    except Exception as e:
+        logger.error(f"Redis error checking token revocation: {e}")
+        return False
+

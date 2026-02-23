@@ -2,29 +2,36 @@
 
 import { useState, useEffect, createContext, useContext } from 'react';
 import { api } from '@/lib/api';
+import { User } from '@/types';
 
 interface AuthContextType {
-    user: any;
+    user: User | null;
     loading: boolean;
     login: (credentials: any) => Promise<void>;
     logout: () => Promise<void>;
     hasRole: (role: string) => boolean;
+    refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+
+    const refreshUser = async () => {
+        try {
+            const u = await api.getCurrentUser();
+            setUser(u);
+        } catch {
+            setUser(null);
+        }
+    };
 
     useEffect(() => {
         async function initAuth() {
             try {
-                const u = await api.getCurrentUser();
-                setUser(u);
-            } catch {
-                // 401 is expected when not logged in — silently handle
-                setUser(null);
+                await refreshUser();
             } finally {
                 setLoading(false);
             }
@@ -39,9 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (res.status === 'mfa_required') {
                 throw new Error('mfa_required');
             }
-            // Login successful — fetch user details immediately
-            const u = await api.getCurrentUser();
-            setUser(u);
+            await refreshUser();
         } catch (e) {
             throw e;
         } finally {
@@ -53,7 +58,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
             await api.logout();
         } catch {
-            // logout may fail if token already expired — that's fine
         }
         setUser(null);
     };
@@ -63,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout, hasRole }}>
+        <AuthContext.Provider value={{ user, loading, login, logout, hasRole, refreshUser }}>
             {children}
         </AuthContext.Provider>
     );

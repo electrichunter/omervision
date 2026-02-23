@@ -18,12 +18,12 @@ async def get_blogs(cursor: int = None, limit: int = 10, include_drafts: bool = 
     if cached:
         return cached
 
-    query = select(Blog).order_by(Blog.id.asc())
+    query = select(Blog).order_by(Blog.date.desc())
     if not include_drafts:
         query = query.filter(Blog.is_published == True)
         
     if cursor:
-        query = query.filter(Blog.id > cursor)
+        query = query.filter(Blog.id < cursor)
     
     result = await db.execute(query.limit(limit))
     blogs = result.scalars().all()

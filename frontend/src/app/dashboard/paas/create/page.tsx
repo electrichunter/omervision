@@ -11,6 +11,7 @@ export default function CreatePaasProject() {
     const [name, setName] = useState("");
     const [repoUrl, setRepoUrl] = useState("");
     const [description, setDescription] = useState("");
+    const [composeCode, setComposeCode] = useState("");
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -18,7 +19,12 @@ export default function CreatePaasProject() {
         setLoading(true);
 
         try {
-            await api.createPaaSProject({ name, repo_url: repoUrl, description });
+            await api.createPaaSProject({
+                name,
+                repo_url: repoUrl,
+                description,
+                compose_code: composeCode || undefined
+            });
             router.push("/dashboard/paas");
         } catch (error: any) {
             alert(`Deploy başlatılamadı: ${error.message}`);
@@ -76,10 +82,23 @@ export default function CreatePaasProject() {
                             <label className="block text-sm font-medium text-gray-300 mb-1.5">Açıklama</label>
                             <textarea
                                 placeholder="İsteğe bağlı kısa not..."
-                                className="w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none resize-none h-24 text-sm"
+                                className="w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none resize-none h-20 text-sm"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                             />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-1.5 flex items-center gap-2">
+                                <Code2 size={16} className="text-blue-400" /> Docker Compose Kodu (İsteğe Bağlı)
+                            </label>
+                            <textarea
+                                placeholder="version: '3.8'\nservices:\n  app: ..."
+                                className="w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none resize-none h-48 text-sm font-mono"
+                                value={composeCode}
+                                onChange={(e) => setComposeCode(e.target.value)}
+                            />
+                            <p className="text-[10px] text-gray-500 mt-1 italic">* Belirtilirse, sistem repo analizi yerine bu kodu kullanacaktır.</p>
                         </div>
                     </div>
 

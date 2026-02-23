@@ -1,8 +1,8 @@
 // Site metadata and configuration
 export const siteConfig = {
   name: "Ömer Faruk Uysal",
-  title: "Full Stack Developer",
-  description: "Modern teknolojilerle dijital deneyimler oluşturuyorum. Performans, erişilebilirlik ve güzel tasarım odaklı çalışıyorum.",
+  title: "Ölçeklenebilir Web Sistemleri, Otomasyon ve Veri Mühendisi",
+  description: "Next.js ve FastAPI mimarileri üzerinde uçtan uca, izole ve yüksek performanslı sistemler inşa ediyorum.",
   url: "https://portfolio.dev",
   ogImage: "/og-image.jpg",
   links: {

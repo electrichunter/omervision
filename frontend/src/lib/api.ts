@@ -1,4 +1,4 @@
-import { BlogPost, Project, SystemStatus } from "@/types";
+import { BlogPost, Project, SystemStatus, User } from "@/types";
 
 export interface PaaSProject {
   id: number;
@@ -10,6 +10,7 @@ export interface PaaSProject {
   port: number | null;
   container_id: string | null;
   host_url: string | null;
+  compose_code: string | null;
   logs: string | null;
   created_at: string;
 }
@@ -103,12 +104,38 @@ class ApiClient {
     });
   }
 
-  async getCurrentUser() {
-    return this.request('/api/auth/me');
+  async getCurrentUser(): Promise<User> {
+    return this.request<User>('/api/auth/me');
   }
 
   async logout() {
     return this.request('/api/auth/logout', { method: 'POST' });
+  }
+
+  // Security & MFA
+  async setupMFA() {
+    return this.request<{ secret: string, qr_code_uri: string }>('/api/auth/mfa/setup', { method: 'POST' });
+  }
+
+  async enableMFA(secret: string, code: string) {
+    return this.request('/api/auth/mfa/enable', {
+      method: 'POST',
+      body: JSON.stringify({ secret, code }),
+    });
+  }
+
+  async disableMFA(code: string) {
+    return this.request('/api/auth/mfa/disable', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    });
+  }
+
+  async changePassword(data: any) {
+    return this.request('/api/auth/password/change', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   }
 
   private mapProject(p: any): Project {
@@ -257,7 +284,7 @@ class ApiClient {
   }
 
   // PaaS Project API
-  async createPaaSProject(data: { repo_url: string; name: string; description?: string }): Promise<PaaSProject> {
+  async createPaaSProject(data: { repo_url: string; name: string; description?: string; compose_code?: string }): Promise<PaaSProject> {
     return this.request<PaaSProject>('/api/paas', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -288,11 +315,22 @@ class ApiClient {
     return this.request(`/api/paas/${id}`, { method: 'DELETE' });
   }
 
-  async updatePaaSProject(id: number, data: { name?: string; repo_url?: string; description?: string }): Promise<PaaSProject> {
+  async updatePaaSProject(id: number, data: { name?: string; repo_url?: string; description?: string; compose_code?: string }): Promise<PaaSProject> {
     return this.request<PaaSProject>(`/api/paas/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+  }
+
+  async generateTTS(text: string): Promise<{ job_id: string; status: string }> {
+    return this.request<{ job_id: string; status: string }>('/api/tts/generate', {
+      method: 'POST',
+      body: JSON.stringify({ text }),
+    });
+  }
+
+  async getTTSStatus(jobId: string): Promise<{ status: string; url?: string; message?: string }> {
+    return this.request<{ status: string; url?: string; message?: string }>(`/api/tts/status/${jobId}`);
   }
 }
 

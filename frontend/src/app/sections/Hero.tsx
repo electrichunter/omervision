@@ -40,11 +40,11 @@ export function Hero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...springPresets.cinematic, delay: 0.2 }}
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight"
           >
-            <span className="text-gradient">Full Stack</span>
+            <span className="text-gradient">Ölçeklenebilir Web Sistemleri,</span>
             <br />
-            <span className="text-[var(--color-text-primary)]">Developer</span>
+            <span className="text-[var(--color-text-primary)]">Otomasyon ve Veri Mühendisi</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -52,10 +52,13 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...springPresets.gentle, delay: 0.3 }}
-            className="text-lg sm:text-xl text-[var(--color-text-secondary)] max-w-2xl mx-auto mb-10"
+            className="text-lg sm:text-xl text-[var(--color-text-secondary)] max-w-3xl mx-auto mb-10 leading-relaxed"
           >
-            Building digital experiences with modern technologies. Focused on performance,
-            accessibility, and beautiful design.
+            Next.js ve FastAPI mimarileri üzerinde uçtan uca, izole ve yüksek performanslı sistemler inşa ediyorum.
+            Uzmanlık alanım; standart web uygulamalarının ötesine geçerek Docker tabanlı PaaS (Platform as a Service)
+            altyapıları kurmak, ileri düzey web scraping işlemleri ile veri hatları oluşturmak ve ses klonlama gibi
+            makine öğrenimi modellerini web tabanlı projelere entegre etmektir. Sadece kod yazmıyorum; mimari
+            tasarlıyor, veritabanı performansını optimize ediyor ve güvenli dağıtım süreçlerini yönetiyorum.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -115,7 +118,7 @@ export function Hero() {
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-          className="w-6 h-10 rounded-full border-2 border-[var(--color-border-hover)] flex items-start justify-center p-2 bg-white/60 backdrop-blur"
+          className="w-6 h-10 rounded-full border-2 border-[var(--color-border-hover)] flex items-start justify-center p-2 bg-[var(--color-bg-secondary)]/60 backdrop-blur"
         >
           <motion.div className="w-1 h-2 rounded-full bg-[var(--color-accent-blue)]" />
         </motion.div>

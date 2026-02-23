@@ -20,7 +20,10 @@ router = APIRouter(prefix="/api/admin", tags=["admin"])
 @router.post("/users", response_model=UserOut)
 async def create_user(user: UserCreate, request: Request, db: AsyncSession = Depends(get_db), current: User = Depends(requires_role('admin'))):
     # check_ip_whitelist(request)
-    hashed = get_password_hash(user.password)
+    try:
+        hashed = get_password_hash(user.password)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     new_user = User(username=user.username, email=user.email, password_hash=hashed, display_name=user.display_name, is_active=True)
     db.add(new_user)
     await db.commit()

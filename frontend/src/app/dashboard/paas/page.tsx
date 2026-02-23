@@ -11,6 +11,7 @@ export default function PaasDashboard() {
     const [editingProject, setEditingProject] = useState<PaaSProject | null>(null);
     const [editName, setEditName] = useState("");
     const [editRepo, setEditRepo] = useState("");
+    const [editCompose, setEditCompose] = useState("");
 
     const fetchProjects = async () => {
         try {
@@ -61,7 +62,11 @@ export default function PaasDashboard() {
     const saveEdit = async () => {
         if (!editingProject) return;
         try {
-            await api.updatePaaSProject(editingProject.id, { name: editName, repo_url: editRepo });
+            await api.updatePaaSProject(editingProject.id, {
+                name: editName,
+                repo_url: editRepo,
+                compose_code: editCompose
+            });
             setEditingProject(null);
             fetchProjects();
         } catch (e) {
@@ -149,7 +154,12 @@ export default function PaasDashboard() {
                                     {proj.project_type || '-'}
                                 </td>
                                 <td className="px-6 py-4 flex items-center justify-end gap-2">
-                                    <button onClick={() => { setEditingProject(proj); setEditName(proj.name); setEditRepo(proj.repo_url); }} className="p-2 text-gray-400 hover:bg-gray-500/10 rounded-lg transition-colors border border-transparent hover:border-gray-500/20" title="Düzenle">
+                                    <button onClick={() => {
+                                        setEditingProject(proj);
+                                        setEditName(proj.name);
+                                        setEditRepo(proj.repo_url);
+                                        setEditCompose(proj.compose_code || "");
+                                    }} className="p-2 text-gray-400 hover:bg-gray-500/10 rounded-lg transition-colors border border-transparent hover:border-gray-500/20" title="Düzenle">
                                         <Edit2 size={16} />
                                     </button>
 
@@ -191,6 +201,14 @@ export default function PaasDashboard() {
                             <div>
                                 <label className="block text-sm text-gray-400 mb-1">Git URL</label>
                                 <input value={editRepo} onChange={e => setEditRepo(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-blue-500" />
+                            </div>
+                            <div>
+                                <label className="block text-sm text-gray-400 mb-1">Docker Compose Code</label>
+                                <textarea
+                                    value={editCompose}
+                                    onChange={e => setEditCompose(e.target.value)}
+                                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-blue-500 h-24 font-mono text-xs"
+                                />
                             </div>
                         </div>
                         <div className="flex items-center justify-end gap-3 mt-6">

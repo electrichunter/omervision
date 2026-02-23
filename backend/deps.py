@@ -31,8 +31,8 @@ def invalidate_blog_cache():
         logger.error(f"Failed to invalidate blog cache: {e}")
 
 # Audit Log Helper
-async def log_audit(db: AsyncSession, user_id: int, action: str, target: str, request: Request):
-    ip = request.client.host
+async def log_audit(db: AsyncSession, user_id: int, action: str, target: str, request: Request = None):
+    ip = request.client.host if request else "system"
     log_entry = AuditLog(user_id=user_id, action=action, target=target, ip_address=ip)
     db.add(log_entry)
     await db.commit()
@@ -57,10 +57,12 @@ async def get_current_user(request: Request, authorization: str = Header(None), 
     
     # Zombie Token Check (Blacklist)
     try:
-        is_blacklisted = redis_client.get(f"blacklist:{token}")
-        if is_blacklisted:
+        from auth import is_token_revoked
+        if is_token_revoked(token):
             logger.warning(f"get_current_user: Token blacklisted: {token[:10]}...")
             raise HTTPException(status_code=401, detail="Token revoked (logged out)")
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Redis error in get_current_user: {e}", exc_info=True)
 

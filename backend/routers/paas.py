@@ -3,6 +3,7 @@ import os
 import shutil
 import subprocess
 import asyncio
+import re
 from typing import List, Optional
 import docker
 from pydantic import BaseModel
@@ -26,6 +27,11 @@ except Exception as e:
 
 WORKSPACE_DIR = "/tmp/paas_projects"
 os.makedirs(WORKSPACE_DIR, exist_ok=True)
+
+def slugify(text):
+    text = text.lower()
+    text = re.sub(r'[^a-z0-9]', '_', text)
+    return re.sub(r'_+', '_', text).strip('_')
 
 async def detect_project_type(project_dir: str) -> str:
     """Analyze the repository files to guess what kind of app it is."""
@@ -130,10 +136,50 @@ async def deploy_project_task(project_id: int, repo_url: str):
             if process.returncode != 0:
                 raise Exception(f"Git clone failed: {stderr.decode()}")
                 
-            project.logs += "Clone successful.\nDetecting project type...\n"
+            project.logs += "Clone successful.\n"
             await db.commit()
-            
-            # 2. Detect & Generate Dockerfile
+
+            # Handle Docker Compose if provided
+            if project.compose_code:
+                project.logs += "Docker Compose code provided. Using compose orchestration...\n"
+                compose_path = os.path.join(project_dir, "docker-compose.yml")
+                with open(compose_path, "w") as f:
+                    f.write(project.compose_code)
+                
+                # We use subprocess to run docker compose
+                # Note: This requires 'docker-compose' or 'docker compose' available
+                # If 'docker compose' fails, we'll try 'docker-compose'
+                project_slug = slugify(project.name)
+                try:
+                    cmd = ["docker", "compose", "-p", project_slug, "up", "-d"]
+                    proc = await asyncio.create_subprocess_exec(
+                        *cmd, cwd=project_dir,
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE
+                    )
+                    out, err = await proc.communicate()
+                    if proc.returncode != 0:
+                         # Try legacy docker-compose
+                        cmd = ["docker-compose", "-p", project_slug, "up", "-d"]
+                        proc = await asyncio.create_subprocess_exec(
+                            *cmd, cwd=project_dir,
+                            stdout=asyncio.subprocess.PIPE,
+                            stderr=asyncio.subprocess.PIPE
+                        )
+                        out, err = await proc.communicate()
+                    
+                    if proc.returncode != 0:
+                        raise Exception(f"Docker Compose failed: {err.decode()}")
+                        
+                    project.status = "running"
+                    project.logs += f"Docker Compose services started with project name: {project_slug}\n"
+                    await db.commit()
+                    return # Exit early as we're done with compose
+                except Exception as comp_e:
+                    raise Exception(f"Compose orchestration failed: {str(comp_e)}")
+
+            # 2. Detect & Generate Dockerfile (Single Container Flow)
+            project.logs += "Detecting project type...\n"
             ptype = await detect_project_type(project_dir)
             project.project_type = ptype
             generate_dockerfile(ptype, project_dir)
@@ -150,16 +196,26 @@ async def deploy_project_task(project_id: int, repo_url: str):
             loop = asyncio.get_event_loop()
             await loop.run_in_executor(None, build_image)
             
-            project.logs += "Docker image built successfully. Staring container...\n"
+            project.logs += "Docker image built successfully. Starting container...\n"
             await db.commit()
             
             # 4. Run Docker Container
             target_port = 3000 if ptype in ["nextjs", "nodejs"] else (8000 if ptype == "fastapi" else 80)
             host_port = find_available_port()
+            container_name = slugify(project.name)
             
+            # Remove old container with same name if exists
+            try:
+                old = docker_client.containers.get(container_name)
+                old.stop()
+                old.remove()
+            except:
+                pass
+
             def run_container():
                 return docker_client.containers.run(
                     image_name,
+                    name=container_name,
                     detach=True,
                     ports={f"{target_port}/tcp": host_port},
                     # Security boundaries
@@ -173,10 +229,8 @@ async def deploy_project_task(project_id: int, repo_url: str):
             project.container_id = container.id
             project.port = host_port
             project.status = "running"
-            # Hardcoded host assumption for preview - assuming frontend accesses via localhost or the actual IP
-            # For this test env, we'll return localhost:[port]
             project.host_url = f"http://localhost:{host_port}"
-            project.logs += f"Container started successfully! Running on port {host_port}.\n"
+            project.logs += f"Container '{container_name}' started successfully! Running on port {host_port}.\n"
             await db.commit()
 
         except Exception as e:
@@ -191,6 +245,7 @@ async def create_project(project: PaaSProjectCreate, background_tasks: Backgroun
         repo_url=project.repo_url,
         name=project.name,
         description=project.description,
+        compose_code=project.compose_code,
         status="pending"
     )
     db.add(new_proj)
@@ -248,6 +303,8 @@ async def update_project(project_id: int, update_data: PaaSProjectUpdate, db: As
         proj.repo_url = update_data.repo_url
     if update_data.description is not None:
         proj.description = update_data.description
+    if update_data.compose_code is not None:
+        proj.compose_code = update_data.compose_code
 
     await db.commit()
     await db.refresh(proj)

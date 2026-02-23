@@ -99,6 +99,14 @@ class LoginRequest(BaseModel):
     username: str
     password: str
     totp_code: Optional[str] = None
+
+class MFASetupResponse(BaseModel):
+    secret: str
+    qr_code_uri: str
+
+class PasswordChangeRequest(BaseModel):
+    old_password: str
+    new_password: str
 class CommentCreate(BaseModel):
     post_id: int
     post_type: str = "blog"
@@ -128,13 +136,15 @@ class NewsletterOut(BaseModel):
 
 class PaaSProjectCreate(BaseModel):
     repo_url: str
-    name: str
+    name: str = Field(..., min_length=3, max_length=50)
     description: Optional[str] = None
+    compose_code: Optional[str] = None
 
 class PaaSProjectUpdate(BaseModel):
     repo_url: Optional[str] = None
     name: Optional[str] = None
     description: Optional[str] = None
+    compose_code: Optional[str] = None
 
 class PaaSProjectOut(BaseModel):
     id: int
@@ -147,6 +157,7 @@ class PaaSProjectOut(BaseModel):
     port: Optional[int]
     container_id: Optional[str]
     host_url: Optional[str]
+    compose_code: Optional[str]
     logs: Optional[str]
     created_at: datetime.datetime
     updated_at: datetime.datetime

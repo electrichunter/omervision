@@ -188,6 +188,7 @@ class PaaSProject(Base):
     port = Column(Integer, nullable=True)
     container_id = Column(String(100), nullable=True)
     host_url = Column(String(255), nullable=True)
+    compose_code = Column(Text, nullable=True)
     logs = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)

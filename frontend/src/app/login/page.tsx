@@ -47,11 +47,11 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f] px-4">
+        <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg-primary)] px-4 transition-colors duration-500">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="max-w-md w-full p-8 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl"
+                className="max-w-md w-full p-8 rounded-3xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)]/50 backdrop-blur-xl shadow-2xl"
             >
                 <h1 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                     OmerVision Dashboard
