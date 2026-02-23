@@ -48,7 +48,7 @@ docker compose up --build -d
 - 🛡️ Rol tabanlı yetkilendirme (RBAC — admin / user)
 - 🚀 **PaaS Modülü:** Git reposunu yapıştır, sistem otomatik olarak tespit, build ve çalıştırır
 - 🖼️ MinIO ile resim yükleme (S3 uyumlu)
-- ⚡ Redis üzerinde Arq iş kuyruğu (e-posta gönderimi)
+- ⚡ Redis üzerinde Arq iş kuyruğu (e-posta gönderimi test edilmedi)
 - 🌗 Karanlık mod destekli modern arayüz
 
 ## Dökümantasyon
