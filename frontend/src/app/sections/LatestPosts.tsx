@@ -25,7 +25,7 @@ export function LatestPosts() {
   if (posts.length === 0) return null;
 
   return (
-    <section className="py-24 md:py-32 bg-[var(--color-bg-secondary)]">
+    <section className="py-24 md:py-32 bg-[var(--color-bg-primary)]">
       <Container>
         <FadeIn className="mb-16">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">

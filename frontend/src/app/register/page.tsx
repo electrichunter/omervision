@@ -37,84 +37,98 @@ export default function RegisterPage() {
     };
 
     return (
-        <main className="min-h-screen flex items-center justify-center bg-[var(--color-bg-primary)] py-12 px-4">
-            <Container size="sm">
+        <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg-primary)] px-4 transition-colors duration-500 relative overflow-hidden bg-noise">
+            {/* Background Orbs */}
+            <div className="absolute top-0 -right-64 w-[600px] h-[600px] bg-[#00BEFF]/10 blur-[120px] rounded-full animate-float" />
+            <div className="absolute bottom-0 -left-64 w-[600px] h-[600px] bg-[#AE4DFF]/10 blur-[120px] rounded-full animate-pulse-subtle" />
+
+            <Container size="sm" className="relative z-10">
                 <FadeIn>
-                    <div className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-8 rounded-2xl shadow-xl">
-                        <div className="text-center mb-8">
-                            <h1 className="text-3xl font-bold mb-2">Create Account</h1>
-                            <p className="text-[var(--color-text-secondary)]">Join Omervision to start sharing.</p>
+                    <div className="max-w-md mx-auto p-10 rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-bg-secondary)]/80 backdrop-blur-3xl shadow-premium relative">
+                        <div className="text-center mb-10">
+                            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-[#00BEFF] via-[#AE4DFF] to-[#FF3B00] rounded-[1.25rem] flex items-center justify-center text-white shadow-2xl shadow-[#AE4DFF]/30 mb-6 -rotate-3">
+                                <span className="text-2xl font-black">OM</span>
+                            </div>
+                            <h1 className="text-4xl font-black tracking-tighter text-[var(--color-text-primary)] font-heading uppercase">Operatör Kaydı</h1>
+                            <p className="text-[10px] uppercase font-black tracking-[0.4em] text-[var(--color-text-muted)] mt-2 opacity-60">System Registration Gate</p>
                         </div>
 
                         {error && (
-                            <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-4 rounded-xl mb-6 text-sm">
+                            <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl mb-8 text-[10px] font-black uppercase tracking-widest text-center animate-shake">
                                 {error}
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium mb-2">Display Name</label>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-[var(--color-text-muted)] ml-1 uppercase tracking-[0.2em]">Sistem Adı</label>
                                 <input
                                     type="text"
                                     required
-                                    className="w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="John Doe"
+                                    className="w-full bg-[var(--color-bg-tertiary)] border-2 border-[var(--color-border)] rounded-2xl px-5 py-4 text-[var(--color-text-primary)] font-bold focus:border-[#00BEFF] focus:ring-4 focus:ring-[#00BEFF]/10 transition-all placeholder:text-[var(--color-text-muted)]"
+                                    placeholder="Görünen İsim"
                                     value={displayName}
                                     onChange={(e) => setDisplayName(e.target.value)}
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-2">Username</label>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-[var(--color-text-muted)] ml-1 uppercase tracking-[0.2em]">Operatör Kimliği</label>
                                 <input
                                     type="text"
                                     required
-                                    className="w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="johndoe"
+                                    className="w-full bg-[var(--color-bg-tertiary)] border-2 border-[var(--color-border)] rounded-2xl px-5 py-4 text-[var(--color-text-primary)] font-bold focus:border-[#AE4DFF] focus:ring-4 focus:ring-[#AE4DFF]/10 transition-all placeholder:text-[var(--color-text-muted)]"
+                                    placeholder="Kullanıcı Adı"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-2">Email</label>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-[var(--color-text-muted)] ml-1 uppercase tracking-[0.2em]">E-Posta Hattı</label>
                                 <input
                                     type="email"
                                     required
-                                    className="w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="john@example.com"
+                                    className="w-full bg-[var(--color-bg-tertiary)] border-2 border-[var(--color-border)] rounded-2xl px-5 py-4 text-[var(--color-text-primary)] font-bold focus:border-[#FF3B00] focus:ring-4 focus:ring-[#FF3B00]/10 transition-all placeholder:text-[var(--color-text-muted)]"
+                                    placeholder="servis@omervision.io"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-2">Password</label>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-[var(--color-text-muted)] ml-1 uppercase tracking-[0.2em]">Güvenlik Anahtarı</label>
                                 <input
                                     type="password"
                                     required
-                                    className="w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full bg-[var(--color-bg-tertiary)] border-2 border-[var(--color-border)] rounded-2xl px-5 py-4 text-[var(--color-text-primary)] font-bold focus:border-[#00BEFF] focus:ring-4 focus:ring-[#00BEFF]/10 transition-all placeholder:text-[var(--color-text-muted)]"
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
                             </div>
 
-                            <Button type="submit" className="w-full" disabled={loading}>
-                                {loading ? 'Creating account...' : 'Sign Up'}
-                            </Button>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full h-16 relative group rounded-2xl overflow-hidden shadow-2xl transition-all active:scale-95 disabled:opacity-50"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#00BEFF] via-[#AE4DFF] to-[#FF3B00] bg-[length:200%_100%] animate-gradient-shift group-hover:scale-110 transition-transform duration-500" />
+                                <span className="relative text-white font-black uppercase tracking-[0.2em] text-sm">
+                                    {loading ? 'Yükleniyor...' : 'Protokolü Onayla'}
+                                </span>
+                            </button>
                         </form>
 
-                        <div className="mt-6 text-center text-sm">
-                            <span className="text-[var(--color-text-secondary)]">Already have an account? </span>
+                        <div className="mt-10 pt-8 border-t border-[var(--color-border)] text-center">
+                            <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-widest mb-4 opacity-40">Zaten bir operatör müsünüz?</p>
                             <button
                                 onClick={() => router.push('/login')}
-                                className="text-blue-500 hover:text-blue-400 font-medium"
+                                className="px-8 py-3 rounded-xl border border-[var(--color-border)] hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] font-black text-[10px] uppercase tracking-widest transition-all"
                             >
-                                Log In
+                                Giriş Yap
                             </button>
                         </div>
                     </div>
                 </FadeIn>
             </Container>
-        </main>
+        </div>
     );
 }

@@ -58,7 +58,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
         },
         editorProps: {
             attributes: {
-                class: 'prose prose-invert prose-lg max-w-none focus:outline-none min-h-[400px] text-gray-300 leading-relaxed',
+                class: 'prose prose-invert prose-lg max-w-none focus:outline-none min-h-[400px] text-[var(--color-text-primary)] leading-relaxed selection:bg-[var(--color-accent-blue)]/30',
             },
             handlePaste: (view, event, slice) => {
                 return false;
@@ -114,7 +114,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
     }, [editor]);
 
     if (!editor) {
-        return <div className="h-96 w-full animate-pulse bg-white/5 rounded-2xl" />;
+        return <div className="h-96 w-full animate-pulse bg-[var(--color-bg-tertiary)] rounded-2xl border border-[var(--color-border)]" />;
     }
 
     const ToolbarButton = ({ onClick, isActive, title, children }: any) => (
@@ -122,10 +122,10 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
             type="button"
             onClick={onClick}
             title={title}
-            className={`p-2.5 rounded-xl transition-all flex items-center justify-center
+            className={`p-2.5 rounded-xl transition-all flex items-center justify-center font-bold
                 ${isActive
-                    ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20 shadow-lg'
-                    : 'bg-transparent text-gray-400 hover:bg-white/10 hover:text-white border border-transparent hover:border-white/5'
+                    ? 'bg-[var(--color-accent-blue)]/20 text-[var(--color-accent-blue)] border border-[var(--color-accent-blue)]/30 shadow-premium'
+                    : 'bg-transparent text-[var(--color-text-muted)] hover:bg-[var(--color-bg-tertiary)] hover:text-[var(--color-text-primary)] border border-transparent hover:border-[var(--color-border)]'
                 }`}
         >
             {children}
@@ -136,20 +136,25 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
         <div className="flex flex-col-reverse md:flex-row gap-4 md:gap-8 tip-tap-editor relative">
             <style jsx global>{`
                 .tip-tap-editor .ProseMirror p.is-editor-empty:first-child::before {
-                    color: #4b5563;
+                    color: var(--color-text-muted);
                     content: attr(data-placeholder);
                     float: left;
                     height: 0;
                     pointer-events: none;
                     font-style: italic;
+                    opacity: 0.4;
                 }
                 
                 .tip-tap-editor .ProseMirror blockquote {
-                    border-left: 3px solid #3b82f6;
-                    padding-left: 1rem;
-                    color: #e2e8f0;
+                    border-left: 4px solid var(--color-accent-blue);
+                    padding-left: 1.5rem;
+                    color: var(--color-text-secondary);
                     font-style: italic;
-                    margin: 1.5rem 0;
+                    margin: 2rem 0;
+                    background: var(--color-bg-tertiary);
+                    padding-top: 1rem;
+                    padding-bottom: 1rem;
+                    border-radius: 0 1rem 1rem 0;
                 }
 
                 .tip-tap-editor .ProseMirror a {
@@ -157,14 +162,15 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
                 }
 
                 .tip-tap-editor .ProseMirror pre {
-                    background: #1e1e24;
-                    color: #e2e8f0;
-                    padding: 1rem;
-                    border-radius: 0.75rem;
+                    background: var(--color-bg-tertiary);
+                    color: var(--color-text-primary);
+                    padding: 1.5rem;
+                    border-radius: 1.5rem;
                     overflow-x: auto;
-                    font-family: monospace;
-                    margin: 1.5rem 0;
-                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    font-family: 'JetBrains Mono', monospace;
+                    margin: 2rem 0;
+                    border: 1px solid var(--color-border);
+                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
                 }
 
                 .tip-tap-editor .ProseMirror code {
@@ -187,12 +193,13 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
                 }
 
                 .tip-tap-editor .ProseMirror h1 {
-                    font-size: 2.25rem;
-                    font-weight: 800;
-                    margin-top: 2rem;
-                    margin-bottom: 1rem;
-                    color: white;
-                    line-height: 1.2;
+                    font-size: 3rem;
+                    font-weight: 900;
+                    margin-top: 3rem;
+                    margin-bottom: 1.5rem;
+                    color: var(--color-text-primary);
+                    line-height: 1.1;
+                    letter-spacing: -0.05em;
                 }
 
                 .tip-tap-editor .ProseMirror h2 {
@@ -232,7 +239,8 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
             />
 
             {/* Main Editor Area */}
-            <div className="flex-1 min-w-0 bg-transparent rounded-2xl md:p-4 transition-colors focus-within:bg-white/[0.02] border border-transparent focus-within:border-white/5">
+            <div className="flex-1 min-w-0 bg-transparent rounded-3xl md:p-6 transition-all focus-within:bg-[var(--color-bg-secondary)] border-2 border-transparent focus-within:border-[var(--color-border)] shadow-premium relative">
+                <div className="absolute inset-0 bg-noise opacity-[0.01] pointer-events-none" />
                 <EditorContent editor={editor} />
             </div>
 
@@ -240,43 +248,43 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
             {editor && (
                 <BubbleMenu
                     editor={editor}
-                    className="flex items-center gap-1 p-1 bg-[#111113] border border-white/10 shadow-2xl rounded-xl backdrop-blur-xl"
+                    className="flex items-center gap-1.5 p-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] shadow-premium rounded-2xl backdrop-blur-3xl"
                 >
                     <button
                         type="button"
                         onClick={() => editor.chain().focus().toggleBold().run()}
-                        className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${editor.isActive('bold') ? 'bg-white/10 text-white' : 'text-gray-400'}`}
+                        className={`p-2.5 rounded-xl transition-all ${editor.isActive('bold') ? 'bg-[var(--color-accent-blue)]/20 text-[var(--color-accent-blue)] border border-[var(--color-accent-blue)]/20' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)]'}`}
                         title="Kalın"
                     >
-                        <Bold size={16} />
+                        <Bold size={16} strokeWidth={3} />
                     </button>
                     <button
                         type="button"
                         onClick={() => editor.chain().focus().toggleItalic().run()}
-                        className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${editor.isActive('italic') ? 'bg-white/10 text-white' : 'text-gray-400'}`}
+                        className={`p-2.5 rounded-xl transition-all ${editor.isActive('italic') ? 'bg-[var(--color-accent-blue)]/20 text-[var(--color-accent-blue)] border border-[var(--color-accent-blue)]/20' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)]'}`}
                         title="Eğik"
                     >
-                        <Italic size={16} />
+                        <Italic size={16} strokeWidth={3} />
                     </button>
                     <button
                         type="button"
                         onClick={setLink}
-                        className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${editor.isActive('link') ? 'bg-white/10 text-blue-400' : 'text-gray-400'}`}
+                        className={`p-2.5 rounded-xl transition-all ${editor.isActive('link') ? 'bg-[var(--color-accent-blue)] text-white shadow-lg' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)]'}`}
                         title="Bağlantı Ekle"
                     >
-                        <LinkIcon size={16} />
+                        <LinkIcon size={16} strokeWidth={3} />
                     </button>
                 </BubbleMenu>
             )}
 
             {/* Vertical Sticky Right Toolbar */}
-            <div className="flex md:flex-col gap-2 md:w-14 shrink-0 overflow-x-auto md:overflow-y-auto no-scrollbar py-2 md:py-4">
-                <div className="md:sticky md:top-24 flex md:flex-col gap-2 bg-[#0d0d0e] border border-white/5 rounded-2xl p-2 shadow-2xl items-center w-max md:w-full">
+            <div className="flex md:flex-col gap-2 md:w-16 shrink-0 overflow-x-auto md:overflow-y-auto no-scrollbar py-2 md:py-4">
+                <div className="md:sticky md:top-24 flex md:flex-col gap-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-3xl p-3 shadow-premium items-center w-max md:w-full">
 
                     {/* Elements for vertical structure */}
                     <div className="hidden md:flex flex-col items-center gap-2 mb-2 w-full">
-                        <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Araçlar</span>
-                        <div className="w-full h-px bg-white/5"></div>
+                        <span className="text-[9px] uppercase font-black text-[var(--color-text-muted)] tracking-[0.2em] opacity-50">Araçlar</span>
+                        <div className="w-full h-px bg-[var(--color-border)] opacity-30"></div>
                     </div>
 
                     <ToolbarButton
@@ -354,7 +362,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
                         onClick={triggerFileInput}
                         disabled={isUploading}
                         className={`p-2.5 rounded-xl transition-all flex items-center justify-center relative
-                            ${isUploading ? 'bg-blue-600/10 text-blue-400 opacity-50 cursor-wait' : 'bg-transparent text-gray-400 hover:bg-blue-600/20 hover:text-blue-400 border border-transparent hover:border-blue-500/20'}`}
+                            ${isUploading ? 'bg-[var(--color-accent-blue)]/10 text-[var(--color-accent-blue)] opacity-50 cursor-wait' : 'bg-transparent text-[var(--color-text-muted)] hover:bg-[var(--color-accent-blue)]/20 hover:text-[var(--color-accent-blue)] border border-transparent hover:border-[var(--color-accent-blue)]/30'}`}
                         title="Bilgisayardan Resim Yükle"
                     >
                         <ImageIcon size={18} className={isUploading ? 'animate-pulse' : ''} />

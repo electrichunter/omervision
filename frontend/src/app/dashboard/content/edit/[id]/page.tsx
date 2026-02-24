@@ -108,28 +108,28 @@ export default function EditContentPage() {
     }
 
     return (
-        <div className="min-h-screen text-gray-200" style={{ background: '#0A0A0B' }}>
-            <header className="sticky top-0 z-50 py-4 px-6 flex items-center justify-between border-b border-white/5 backdrop-blur-xl bg-[#0A0A0B]/80">
+        <div className="min-h-screen text-[var(--color-text-primary)] bg-[var(--color-bg-primary)]">
+            <header className="sticky top-0 z-50 py-5 px-8 flex items-center justify-between border-b border-[var(--color-border)] backdrop-blur-3xl bg-[var(--color-bg-primary)]/80">
                 <button
                     onClick={() => router.push('/dashboard/content')}
-                    className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+                    className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
                 >
                     <ArrowLeft size={16} /> İçeriklere Dön
                 </button>
                 <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 text-sm text-gray-300 font-medium">
+                    <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] font-medium">
                         <input
                             type="checkbox"
                             checked={isPublished}
                             onChange={(e) => setIsPublished(e.target.checked)}
-                            className="bg-transparent border-white/20 rounded accent-blue-600 w-4 h-4 cursor-pointer"
+                            className="bg-transparent border-[var(--color-border)] rounded accent-[var(--color-accent-blue)] w-4 h-4 cursor-pointer"
                         />
                         Aktif Yayın
                     </label>
                     <button
                         onClick={handleSubmit}
                         disabled={saving || !title || !content || content === '<p></p>'}
-                        className="px-5 py-2 bg-blue-600 hover:bg-blue-500 rounded-full font-medium transition-all disabled:opacity-50 text-white text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20"
+                        className="px-5 py-2 bg-[var(--color-accent-blue)] hover:bg-[var(--color-accent-blue)]/90 rounded-md font-medium transition-colors disabled:opacity-50 text-white text-sm flex items-center gap-2 shadow-sm"
                     >
                         {saving ? '⏳ Güncelleniyor...' : 'Güncelle'}
                     </button>
@@ -149,7 +149,7 @@ export default function EditContentPage() {
                             onChange={(e) => {
                                 setTitle(e.target.value);
                             }}
-                            className="w-full bg-transparent text-4xl md:text-5xl lg:text-6xl font-black text-white placeholder-gray-600 outline-none resize-none overflow-hidden leading-tight"
+                            className="w-full bg-transparent text-4xl md:text-5xl lg:text-6xl font-black text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] placeholder-opacity-50 outline-none resize-none overflow-hidden leading-tight"
                             placeholder="Başlık..."
                             rows={1}
                         />
@@ -158,17 +158,17 @@ export default function EditContentPage() {
                     <div className="group relative pt-2 pb-6">
                         {coverImage ? (
                             <div className="relative mb-8 group">
-                                <img src={coverImage} alt="Kapak" className="w-full h-auto max-h-[500px] object-cover rounded-2xl border border-white/5 shadow-2xl" />
+                                <img src={coverImage} alt="Kapak" className="w-full h-auto max-h-[500px] object-cover rounded-md border border-[var(--color-border)] shadow-sm" />
                                 <button
                                     onClick={() => setCoverImage('')}
-                                    className="absolute top-4 right-4 bg-red-500/90 text-white px-4 py-2 rounded-xl text-sm font-medium opacity-0 group-hover:opacity-100 transition-all backdrop-blur transform hover:scale-105"
+                                    className="absolute top-4 right-4 bg-red-500/90 text-white px-4 py-2 rounded-md text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur"
                                 >
                                     Kaldır
                                 </button>
                             </div>
                         ) : (
                             <div className="flex items-center gap-4">
-                                <label className="inline-flex items-center gap-2 text-gray-400 hover:text-white cursor-pointer transition-colors px-4 py-2.5 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.06] text-sm font-medium">
+                                <label className="inline-flex items-center gap-2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] cursor-pointer transition-colors px-4 py-2.5 rounded-md border border-[var(--color-border)] bg-[var(--color-bg-secondary)] hover:border-[var(--color-accent-blue)]/50 text-sm font-medium shadow-sm">
                                     <ImageIcon size={18} />
                                     <span>Kapak Resmi Ekle</span>
                                     <input type="file" accept="image/*" onChange={handleCoverImageUpload} className="hidden" />
@@ -186,42 +186,42 @@ export default function EditContentPage() {
                         />
                     </div>
 
-                    <div className="mt-32 pt-10 border-t border-white/10 space-y-8 bg-white/[0.01] p-8 rounded-3xl border border-white/5">
-                        <h3 className="text-xl font-bold flex items-center gap-3 text-white">
-                            <Settings size={22} className="text-blue-400" /> Yayın Ayarları
+                    <div className="mt-32 pt-10 border-t border-[var(--color-border)] space-y-8 bg-[var(--color-bg-secondary)] p-8 rounded-lg shadow-sm">
+                        <h3 className="text-xl font-bold flex items-center gap-3 text-[var(--color-text-primary)]">
+                            <Settings size={22} className="text-[var(--color-accent-blue)]" /> Yayın Ayarları
                         </h3>
 
                         <div className="grid gap-6">
                             <div>
-                                <label className="block text-sm font-semibold text-gray-300 mb-3">Kısa Açıklama (Özet)</label>
+                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3">Kısa Açıklama (Özet)</label>
                                 <textarea
                                     value={excerpt}
                                     onChange={(e) => setExcerpt(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-white placeholder-gray-600 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 outline-none transition-all resize-none h-28"
+                                    className="w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-md px-5 py-4 text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:border-[var(--color-accent-blue)] outline-none transition-colors resize-none h-28"
                                     placeholder="Yazının kısa bir özeti..."
                                 />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-300 mb-3">Özel URL (Slug)</label>
+                                    <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3">Özel URL (Slug)</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">/blog/</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] text-sm">/blog/</span>
                                         <input
                                             type="text"
                                             value={slug}
                                             onChange={(e) => setSlug(e.target.value)}
-                                            className="w-full bg-white/5 border border-white/5 rounded-2xl pl-14 pr-5 py-4 text-white placeholder-gray-600 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 outline-none transition-all font-mono text-sm"
+                                            className="w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-md pl-14 pr-5 py-4 text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:border-[var(--color-accent-blue)] outline-none transition-colors font-mono text-sm"
                                         />
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-300 mb-3">Etiketler</label>
+                                    <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3">Etiketler</label>
                                     <input
                                         type="text"
                                         value={tags}
                                         onChange={(e) => setTags(e.target.value)}
-                                        className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-white placeholder-gray-600 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 outline-none transition-all"
+                                        className="w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-md px-5 py-4 text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:border-[var(--color-accent-blue)] outline-none transition-colors"
                                         placeholder="Teknoloji, Kodlama (virgülle ayırın)"
                                     />
                                 </div>

@@ -54,19 +54,19 @@ export default function PaasViewerPage() {
     const isDeploying = project.status === "deploying" || project.status === "pending";
 
     return (
-        <div className="flex flex-col h-screen bg-[#07070d]">
+        <div className="flex flex-col h-screen bg-[var(--color-bg-primary)]">
             {/* Unified Nav & Info Bar */}
-            <div className="h-14 bg-[#0a0a0f] border-b border-white/10 flex items-center justify-between px-4 lg:px-6 flex-shrink-0 z-50 shadow-md">
+            <div className="h-14 bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)] flex items-center justify-between px-4 lg:px-6 flex-shrink-0 z-50 shadow-premium">
                 <div className="flex items-center gap-4">
-                    <button onClick={() => router.back()} className="text-gray-400 hover:text-white transition-colors bg-white/5 p-1.5 rounded-lg border border-white/5">
+                    <button onClick={() => router.back()} className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors bg-[var(--color-bg-tertiary)] p-1.5 rounded-lg border border-[var(--color-border)]">
                         <MoveLeft size={18} />
                     </button>
-                    <div className="h-4 w-px bg-white/10" />
+                    <div className="h-4 w-px bg-[var(--color-border)] opacity-30" />
                     <div className="flex items-center gap-3">
                         <div className={`w-2 h-2 rounded-full ${isRunning ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : isDeploying ? 'bg-blue-500 animate-pulse' : 'bg-red-500'}`} />
-                        <h1 className="text-sm font-bold text-white flex items-center gap-2">
+                        <h1 className="text-sm font-bold text-[var(--color-text-primary)] flex items-center gap-2">
                             {project.name}
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 uppercase font-mono text-gray-400 ml-1">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] uppercase font-mono text-[var(--color-text-muted)] ml-1">
                                 {project.project_type || 'Bilinmiyor'}
                             </span>
                         </h1>
@@ -85,9 +85,9 @@ export default function PaasViewerPage() {
             </div>
 
             {/* Main Viewing Area */}
-            <div className="flex-1 overflow-hidden relative flex items-center justify-center p-4 lg:p-8 bg-[#0c0c14] custom-scrollbar">
+            <div className="flex-1 overflow-hidden relative flex items-center justify-center p-4 lg:p-8 bg-[var(--color-bg-primary)] custom-scrollbar">
                 {isRunning && project.host_url ? (
-                    <div className="w-full max-w-[1400px] aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-blue-900/10 bg-white relative ring-1 ring-white/5">
+                    <div className="w-full max-w-[1400px] aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-blue-900/10 bg-[var(--color-bg-secondary)] relative ring-1 ring-white/5">
                         <iframe
                             src={project.host_url}
                             className="w-full h-full border-none"
@@ -96,14 +96,14 @@ export default function PaasViewerPage() {
                         />
                     </div>
                 ) : (
-                    <div className="w-full max-w-[1400px] aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-[#0a0a0f] p-6 lg:p-10 overflow-y-auto font-mono text-sm relative ring-1 ring-white/5">
+                    <div className="w-full max-w-[1400px] aspect-video rounded-[2.5rem] overflow-hidden border border-[var(--color-border)] shadow-premium bg-[var(--color-bg-secondary)] p-6 lg:p-10 overflow-y-auto font-mono text-sm relative">
                         <div className="max-w-4xl mx-auto space-y-4">
-                            <div className="flex items-center gap-3 text-blue-400 pb-4 border-b border-white/5">
+                            <div className="flex items-center gap-3 text-[var(--color-accent-blue)] pb-4 border-b border-[var(--color-border)] opacity-60">
                                 <TerminalSquare size={20} />
-                                <span className="font-semibold">Sistem Logları & Build Çıktısı</span>
+                                <span className="font-black uppercase tracking-widest text-xs">Sistem Logları & Build Çıktısı</span>
                             </div>
 
-                            <pre className="text-gray-300 whitespace-pre-wrap leading-relaxed">
+                            <pre className="text-[var(--color-text-secondary)] whitespace-pre-wrap leading-relaxed opacity-90">
                                 {project.logs || '> Bekleniyor...'}
                             </pre>
 

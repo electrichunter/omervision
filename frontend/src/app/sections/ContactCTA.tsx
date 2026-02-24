@@ -31,14 +31,14 @@ export function ContactCTA() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href={`mailto:${siteConfig.links.email}`}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-text-primary)] text-white rounded-xl font-medium text-sm hover:opacity-90 transition-opacity shadow-lg shadow-black/10"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black rounded-xl font-bold text-sm hover:bg-white/90 transition-all shadow-xl shadow-white/5 active:scale-95"
               >
                 <Mail size={17} />
                 E-posta Gönder
               </Link>
               <Link
                 href="/projects"
-                className="inline-flex items-center gap-2 px-6 py-3 border border-[var(--color-border)] text-[var(--color-text-secondary)] rounded-xl font-medium text-sm hover:border-[var(--color-border-hover)] hover:text-[var(--color-text-primary)] transition-colors bg-white"
+                className="inline-flex items-center gap-2 px-6 py-3 border-2 border-[var(--color-border)] text-[var(--color-text-primary)] rounded-xl font-bold text-sm hover:border-[var(--color-accent-blue)] hover:text-[var(--color-accent-blue)] transition-all bg-transparent active:scale-95"
               >
                 Projeleri İncele
                 <ArrowRight size={17} />

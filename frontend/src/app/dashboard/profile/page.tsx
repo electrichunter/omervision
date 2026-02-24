@@ -62,7 +62,7 @@ function CategoryBlock({
     };
 
     return (
-        <div className="border border-[var(--color-border)] rounded-2xl overflow-hidden bg-white">
+        <div className="border border-[var(--color-border)] rounded-lg overflow-hidden bg-[var(--color-bg-secondary)] shadow-sm">
             {/* Header */}
             <div
                 className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-[var(--color-bg-secondary)] transition-colors"
@@ -88,10 +88,10 @@ function CategoryBlock({
                         ))}
                     </div>
                     <button onClick={e => { e.stopPropagation(); onDelete(index); }}
-                        className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition-colors ml-2">
+                        className="p-1.5 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors ml-2">
                         <Trash2 size={15} />
                     </button>
-                    {open ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
+                    {open ? <ChevronUp size={16} className="text-[var(--color-text-muted)]" /> : <ChevronDown size={16} className="text-[var(--color-text-muted)]" />}
                 </div>
             </div>
 
@@ -99,7 +99,7 @@ function CategoryBlock({
             {open && (
                 <div className="px-5 pb-5 space-y-3 border-t border-[var(--color-border)] pt-4">
                     {cat.skills.map((skill, si) => (
-                        <div key={si} className="grid grid-cols-[1fr_100px_auto] gap-3 items-center bg-[var(--color-bg-secondary)] rounded-xl p-3">
+                        <div key={si} className="grid grid-cols-[1fr_100px_auto] gap-3 items-center bg-[var(--color-bg-secondary)] rounded-md p-3 border border-[var(--color-border)]">
                             <div className="space-y-1">
                                 <input
                                     className="w-full text-sm font-medium bg-transparent outline-none border-b border-transparent focus:border-[var(--color-accent-blue)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)]"
@@ -122,13 +122,13 @@ function CategoryBlock({
                                 <span className="text-xs font-bold text-[var(--color-accent-blue)] w-8 text-right">{skill.level}%</span>
                             </div>
                             <button onClick={() => removeSkill(si)}
-                                className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition-colors">
+                                className="p-1.5 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
                                 <Trash2 size={14} />
                             </button>
                         </div>
                     ))}
                     <button onClick={addSkill}
-                        className="flex items-center gap-2 text-sm text-[var(--color-accent-blue)] hover:bg-blue-50 px-3 py-2 rounded-xl transition-colors font-medium">
+                        className="flex items-center gap-2 text-sm text-[var(--color-accent-blue)] hover:bg-[var(--color-accent-blue)]/10 px-4 py-2 rounded-md transition-colors font-black uppercase tracking-widest text-[10px]">
                         <Plus size={15} /> Teknoloji Ekle
                     </button>
                 </div>
@@ -238,7 +238,7 @@ export default function ProfilePage() {
                 <button
                     onClick={save}
                     disabled={saving}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-[var(--color-accent-blue)] text-white rounded-xl font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg shadow-blue-500/20"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-[var(--color-accent-blue)] text-white rounded-md font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 shadow-sm"
                 >
                     <Save size={16} />
                     {saving ? "Kaydediliyor..." : saved ? "✓ Kaydedildi" : "Kaydet"}
@@ -246,11 +246,11 @@ export default function ProfilePage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-1 p-1 bg-[var(--color-bg-secondary)] rounded-xl w-fit border border-[var(--color-border)]">
+            <div className="flex gap-1 p-1 bg-[var(--color-bg-secondary)] rounded-lg w-fit border border-[var(--color-border)]">
                 {(["about", "skills"] as const).map(t => (
                     <button key={t} onClick={() => setTab(t)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === t ? 'bg-white text-[var(--color-text-primary)] shadow-sm' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]'}`}>
-                        {t === "about" ? <><User size={15} /> Hakkımda</> : <><Wrench size={15} /> Beceriler</>}
+                        className={`flex items-center gap-2 px-6 py-2.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-all ${tab === t ? 'bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] shadow-sm border border-[var(--color-border)]' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]'}`}>
+                        {t === "about" ? <><User size={14} /> Hakkımda</> : <><Wrench size={14} /> Beceriler</>}
                     </button>
                 ))}
             </div>
@@ -268,10 +268,10 @@ export default function ProfilePage() {
                         { label: "Twitter URL", key: "twitter", placeholder: "https://twitter.com/..." },
                         { label: "LinkedIn URL", key: "linkedin", placeholder: "https://linkedin.com/in/..." },
                     ].map(f => (
-                        <div key={f.key} className="bg-white border border-[var(--color-border)] rounded-2xl p-4">
-                            <label className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-2 block">{f.label}</label>
+                        <div key={f.key} className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg p-6 shadow-sm group hover:border-[var(--color-accent-blue)]/30 transition-all">
+                            <label className="text-[10px] font-black text-[var(--color-text-muted)] uppercase tracking-[0.2em] mb-3 block opacity-60">{f.label}</label>
                             <input
-                                className="w-full bg-transparent outline-none text-[var(--color-text-primary)] text-sm border-b border-[var(--color-border)] focus:border-[var(--color-accent-blue)] transition-colors pb-1"
+                                className="w-full bg-transparent outline-none text-[var(--color-text-primary)] font-bold text-base border-b-2 border-[var(--color-border)] focus:border-[var(--color-accent-blue)] transition-all pb-2 placeholder:text-[var(--color-text-muted)]/30"
                                 value={(about as any)[f.key] || ""}
                                 placeholder={f.placeholder}
                                 onChange={e => setAbout({ ...about, [f.key]: e.target.value })}
@@ -280,48 +280,50 @@ export default function ProfilePage() {
                     ))}
 
                     {/* Avatar Upload */}
-                    <div className="bg-white border border-[var(--color-border)] rounded-2xl p-4 flex flex-col justify-center">
-                        <label className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-2 block">Avatar (Profil Resmi) - Dairesel Önizleme</label>
+                    <div className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg p-6 shadow-sm">
+                        <label className="text-[10px] font-black text-[var(--color-text-muted)] uppercase tracking-[0.2em] mb-4 block opacity-60">Avatar (Profil Resmi) - Dairesel Önizleme</label>
                         <div className="flex items-center gap-4">
                             {about.avatar ? (
-                                <img src={about.avatar} alt="Avatar" className={`w-24 h-24 rounded-full object-cover ${about.avatarPosition || 'object-center'} border border-gray-200 shadow-sm`} />
+                                <img src={about.avatar} alt="Avatar" className={`w-32 h-32 rounded-full object-cover ${about.avatarPosition || 'object-center'} border-2 border-[var(--color-border)] shadow-2xl`} />
                             ) : (
-                                <div className="w-24 h-24 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center">
-                                    <User size={30} className="text-gray-400" />
+                                <div className="w-32 h-32 rounded-full bg-[var(--color-bg-tertiary)] border-2 border-[var(--color-border)] flex items-center justify-center">
+                                    <User size={40} className="text-[var(--color-text-muted)] opacity-20" />
                                 </div>
                             )}
-                            <label className="inline-flex items-center gap-2 text-[var(--color-accent-blue)] hover:bg-blue-50 cursor-pointer transition-colors px-3 py-1.5 rounded-lg border border-blue-100 text-sm font-medium">
-                                {uploadingAvatar ? "Yükleniyor..." : "Dosya Seç"}
-                                <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" disabled={uploadingAvatar} />
-                            </label>
-                            {about.avatar && (
-                                <button onClick={() => setAbout({ ...about, avatar: '' })} className="text-xs text-red-500 hover:text-red-600 font-medium ml-2">Kaldır</button>
-                            )}
+                            <div className="flex flex-col gap-3">
+                                <label className="inline-flex items-center gap-3 text-[var(--color-accent-blue)] hover:bg-[var(--color-accent-blue)]/10 cursor-pointer transition-all px-6 py-3 rounded-2xl border border-[var(--color-accent-blue)]/20 text-[10px] font-black uppercase tracking-widest shadow-lg">
+                                    {uploadingAvatar ? "Yükleniyor..." : "Dosya Seç"}
+                                    <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" disabled={uploadingAvatar} />
+                                </label>
+                                {about.avatar && (
+                                    <button onClick={() => setAbout({ ...about, avatar: '' })} className="text-[10px] text-red-400 hover:text-red-500 font-black uppercase tracking-widest">Kaldır</button>
+                                )}
+                            </div>
                         </div>
                         {about.avatar && (
                             <div className="mt-6 border-t border-[var(--color-border)] pt-4">
                                 <label className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-2 block">Görselin Odak Noktası</label>
-                                <p className="text-xs text-gray-400 mb-3">Kare olmayan fotoğrafların yuvarlak / dikey çerçeveye sığdırılırken neresine odaklanılacağını seçin.</p>
+                                <p className="text-xs text-[var(--color-text-muted)] mb-3">Kare olmayan fotoğrafların yuvarlak / dikey çerçeveye sığdırılırken neresine odaklanılacağını seçin.</p>
                                 <select
-                                    className="bg-white/[0.05] border border-white/10 text-gray-200 text-sm rounded-lg focus:ring-[var(--color-accent-blue)] focus:border-[var(--color-accent-blue)] outline-none block w-full p-2.5 transition-colors"
+                                    className="bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm rounded-lg focus:ring-[var(--color-accent-blue)] focus:border-[var(--color-accent-blue)] outline-none block w-full p-2.5 transition-colors"
                                     value={about.avatarPosition || 'object-center'}
                                     onChange={(e) => setAbout({ ...about, avatarPosition: e.target.value })}
                                 >
-                                    <option value="object-center" className="text-gray-800">Merkez (Ortala)</option>
-                                    <option value="object-top" className="text-gray-800">Üst</option>
-                                    <option value="object-bottom" className="text-gray-800">Alt</option>
-                                    <option value="object-left" className="text-gray-800">Sol</option>
-                                    <option value="object-right" className="text-gray-800">Sağ</option>
+                                    <option value="object-center" className="bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]">Merkez (Ortala)</option>
+                                    <option value="object-top" className="bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]">Üst</option>
+                                    <option value="object-bottom" className="bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]">Alt</option>
+                                    <option value="object-left" className="bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]">Sol</option>
+                                    <option value="object-right" className="bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]">Sağ</option>
                                 </select>
                             </div>
                         )}
                     </div>
 
                     {/* Bio */}
-                    <div className="lg:col-span-2 bg-white border border-[var(--color-border)] rounded-2xl p-4">
-                        <label className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-2 block">Biyografi</label>
+                    <div className="lg:col-span-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg p-8 shadow-sm">
+                        <label className="text-[10px] font-black text-[var(--color-text-muted)] uppercase tracking-[0.2em] mb-4 block opacity-60">Biyografi</label>
                         <textarea
-                            className="w-full bg-transparent outline-none text-[var(--color-text-primary)] text-sm resize-none focus:ring-0 h-28 leading-relaxed"
+                            className="w-full bg-transparent outline-none text-[var(--color-text-primary)] font-bold text-base resize-none focus:ring-0 h-40 leading-relaxed placeholder:text-[var(--color-text-muted)]/30"
                             value={about.bio}
                             placeholder="Kendiniz hakkında birkaç cümle..."
                             onChange={e => setAbout({ ...about, bio: e.target.value })}
@@ -329,16 +331,16 @@ export default function ProfilePage() {
                     </div>
 
                     {/* Available toggle */}
-                    <div className="lg:col-span-2 bg-white border border-[var(--color-border)] rounded-2xl p-4 flex items-center justify-between">
+                    <div className="lg:col-span-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg p-6 shadow-sm flex items-center justify-between">
                         <div>
-                            <p className="font-semibold text-[var(--color-text-primary)] text-sm">Freelance için müsait</p>
-                            <p className="text-xs text-[var(--color-text-muted)] mt-0.5">Anasayfada "Available for freelance work" rozeti</p>
+                            <p className="font-black text-[var(--color-text-primary)] text-[10px] uppercase tracking-widest">Freelance için müsait</p>
+                            <p className="text-[10px] font-bold text-[var(--color-text-muted)] mt-1 uppercase tracking-tight opacity-40">Anasayfada "Available for freelance work" rozeti</p>
                         </div>
                         <button
                             onClick={() => setAbout({ ...about, available: !about.available })}
-                            className={`relative w-12 h-6 rounded-full transition-colors ${about.available ? 'bg-emerald-500' : 'bg-gray-300'}`}
+                            className={`relative w-14 h-8 rounded-full transition-all border-2 ${about.available ? 'bg-[#00D47B]/10 border-[#00D47B]/30' : 'bg-[var(--color-bg-tertiary)] border-[var(--color-border)]'}`}
                         >
-                            <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${about.available ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                            <span className={`absolute top-1 w-5 h-5 rounded-full shadow-lg transition-transform ${about.available ? 'translate-x-7 bg-[#00D47B]' : 'translate-x-1 bg-[var(--color-text-muted)]'}`} />
                         </button>
                     </div>
                 </motion.div>
@@ -351,7 +353,7 @@ export default function ProfilePage() {
                         <CategoryBlock key={i} cat={cat} index={i} onChange={updateCategory} onDelete={deleteCategory} />
                     ))}
                     <button onClick={addCategory}
-                        className="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-[var(--color-border)] rounded-2xl text-sm font-medium text-[var(--color-text-muted)] hover:border-[var(--color-accent-blue)] hover:text-[var(--color-accent-blue)] transition-all">
+                        className="w-full flex items-center justify-center gap-2 py-4 border border-[var(--color-border)] rounded-lg text-sm font-medium text-[var(--color-text-muted)] hover:border-[var(--color-accent-blue)] hover:text-[var(--color-accent-blue)] transition-all shadow-sm bg-[var(--color-bg-secondary)]">
                         <Plus size={18} /> Yeni Kategori Ekle
                     </button>
                 </motion.div>

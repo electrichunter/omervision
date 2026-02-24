@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Github, Activity } from "lucide-react";
+import { ArrowUpRight, Github, Activity, Zap } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { FadeIn } from "@/components/animation/FadeIn";
 import { api, PaaSProject } from "@/lib/api";
@@ -24,61 +24,88 @@ export function FeaturedProjects() {
   if (projects.length === 0) return null;
 
   return (
-    <section className="py-24 md:py-32">
-      <Container>
-        <FadeIn className="mb-16">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-            <div>
-              <h2 className="text-[var(--color-text-primary)] mb-4 font-bold text-3xl">Canlı Projelerim</h2>
-              <p className="text-[var(--color-text-secondary)] max-w-2xl text-lg">
-                Kendi izole VDS sunucumda barındırdığım ve yönettiğim en son web uygulamaları ve projelerim.
+    <section className="py-24 md:py-40 relative overflow-hidden bg-[var(--color-bg-primary)]">
+      {/* Flat background, no glows */}
+
+      <Container className="relative z-10">
+        <FadeIn className="mb-24">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-10">
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <span className="w-16 h-1 bg-[var(--color-accent-blue)] rounded-full" />
+                <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--color-accent-blue)]">OPERASYONEL MERKEZ</span>
+              </div>
+              <h2 className="text-[var(--color-text-primary)] font-black text-5xl sm:text-6xl lg:text-7xl tracking-tighter leading-[0.95] font-heading">
+                Dijital <br /><span className="text-[var(--color-accent-blue)] drop-shadow-[0_10px_30px_rgba(0,190,255,0.2)]">İstasyonlar</span>
+              </h2>
+              <p className="text-[var(--color-text-secondary)] max-w-2xl text-xl font-medium opacity-70 leading-relaxed tracking-tight">
+                VDS sunucularım üzerinde Docker ile izole edilmiş, yüksek performanslı uygulama ekosistemim.
               </p>
             </div>
             <Link
               href="/projects"
-              className="text-blue-500 hover:text-blue-400 font-medium inline-flex items-center gap-1 transition-colors group"
+              className="px-10 py-5 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] hover:border-[var(--color-accent-blue)] text-[var(--color-text-primary)] font-black text-[10px] uppercase tracking-[0.3em] rounded-md transition-colors group flex items-center gap-4 shadow-sm"
             >
-              Tüm projeleri gör
-              <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              Arşivi İncele
+              <ArrowUpRight size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform text-[var(--color-accent-blue)]" />
             </Link>
           </div>
         </FadeIn>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {projects.map((project, index) => (
             <FadeIn key={project.id} delay={index * 0.1}>
-              <Link href={`/paas/${project.id}`}>
+              <Link href={`/paas/${project.id}`} className="block h-full group">
                 <motion.article
-                  whileHover={{ y: -4 }}
-                  transition={springPresets.gentle}
-                  className="group relative bg-[#0a0a0f] border border-white/5 rounded-2xl overflow-hidden hover:shadow-lg hover:shadow-blue-900/10 hover:border-blue-500/30 transition-all duration-300 h-full flex flex-col"
+                  className="relative h-full flex flex-col bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg overflow-hidden shadow-sm transition-colors duration-300 group-hover:border-[var(--color-accent-blue)]/50"
                 >
-                  {/* Placeholder Banner */}
-                  <div className="relative aspect-video overflow-hidden border-b border-white/5">
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-950/40 to-black flex flex-col items-center justify-center text-gray-500 gap-3">
-                      <Activity size={32} className={project.status === "running" ? "text-emerald-500" : "text-blue-500 animate-pulse"} />
-                      <span className="text-lg font-medium text-gray-300 px-4 text-center line-clamp-1">{project.name}</span>
+                  {/* High Impact Media Section */}
+                  <div className="relative aspect-[16/10] overflow-hidden border-b border-[var(--color-border)]">
+                    <div className="absolute inset-0 bg-[#000000]" />
+
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-8 p-10">
+                      <div
+                        className="w-28 h-28 rounded-md flex items-center justify-center shadow-sm transition-colors duration-300 bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] group-hover:bg-[var(--color-accent-blue)]/10 group-hover:text-[var(--color-accent-blue)] border border-[var(--color-border)] group-hover:border-[var(--color-accent-blue)]/20"
+                      >
+                        <Activity size={56} />
+                      </div>
+                      <div className="text-center space-y-2">
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--color-text-muted)] opacity-50">Sistem ID: {String(project.id).slice(0, 8)}</span>
+                        <h3 className="text-3xl font-black text-white tracking-tighter line-clamp-1 font-heading uppercase">{project.name}</h3>
+                      </div>
                     </div>
-                    <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                    <div className="absolute top-8 right-8">
+                      <div className="p-4 bg-[var(--color-bg-primary)] rounded-md border border-[var(--color-border)] text-[var(--color-text-secondary)] opacity-0 group-hover:opacity-100 group-hover:text-[var(--color-accent-blue)] group-hover:border-[var(--color-accent-blue)]/50 transition-all duration-300">
+                        <ArrowUpRight size={24} />
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Content */}
-                  <div className="p-6 flex-1 flex flex-col">
-                    <div className="flex items-start justify-between gap-4 mb-3">
-                      <div>
-                        <span className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1 block">
-                          {project.project_type || 'Uygulama'} • {project.status === 'running' ? 'Yayında' : 'Dağıtılıyor'}
-                        </span>
-                        <h2 className="text-xl font-semibold text-gray-200 group-hover:text-blue-400 transition-colors">
-                          {project.name}
-                        </h2>
-                      </div>
-                      <ArrowUpRight size={20} className="text-gray-600 group-hover:text-blue-400 transition-colors flex-shrink-0 mt-1" />
+                  {/* Body Content */}
+                  <div className="p-12 flex-1 flex flex-col">
+                    <div className="flex flex-wrap items-center gap-4 mb-8">
+                      <span className="px-5 py-2 bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] text-[9px] font-black uppercase tracking-[0.3em] rounded-md border border-[var(--color-border)]">
+                        {project.project_type || 'CORE SERVICE'}
+                      </span>
+                      <span className="px-5 py-2 text-[9px] font-black uppercase tracking-[0.3em] rounded-md border bg-[var(--color-bg-primary)] text-[var(--color-text-secondary)] border-[var(--color-border)]">
+                        {project.status === 'running' ? '• System Online' : '• Deploying Node'}
+                      </span>
                     </div>
-                    <p className="text-gray-400 mb-6 text-sm flex-1">{project.description || "Bu proje için bir açıklama girilmemiş."}</p>
-                    <div className="flex items-center gap-2 pt-4 border-t border-white/5 text-gray-500 text-xs">
-                      <Github size={14} />
-                      <span className="truncate max-w-[250px]">{project.repo_url.replace("https://github.com/", "")}</span>
+
+                    <p className="text-[var(--color-text-secondary)] font-medium text-lg leading-relaxed mb-10 flex-1 opacity-80 tracking-tight">
+                      {project.description || "Yüksek erişilebilirlik ve performans odaklı mikro-servis mimarisi."}
+                    </p>
+
+                    <div className="flex items-center justify-between pt-10 border-t border-[var(--color-border)]">
+                      <div className="flex items-center gap-4 text-[var(--color-text-muted)] hover:text-[#00BEFF] transition-all group/repo">
+                        <Github size={20} className="group-hover/repo:scale-125 transition-transform" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em]">{project.repo_url.split("/").pop()}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-[var(--color-text-muted)] hidden sm:block">Ping: 24ms</span>
+                        <div className="w-3 h-3 rounded-full bg-[var(--color-text-secondary)]" />
+                      </div>
                     </div>
                   </div>
                 </motion.article>

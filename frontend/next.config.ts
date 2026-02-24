@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://backend:8000/api/:path*', // Docker internal network
+        destination: `${process.env.INTERNAL_API_URL || 'http://127.0.0.1:8000'}/api/:path*`,
       },
     ];
   },

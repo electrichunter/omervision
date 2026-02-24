@@ -9,16 +9,17 @@ export default function ThemeToggle() {
 
     return (
         <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, backgroundColor: 'var(--color-bg-tertiary)' }}
             whileTap={{ scale: 0.95 }}
             onClick={toggleTheme}
-            className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors flex items-center justify-center text-text-primary"
+            className="p-3 rounded-2xl bg-[var(--color-bg-secondary)] border-2 border-[var(--color-border)] hover:border-[var(--color-accent-blue)]/50 transition-all flex items-center justify-center text-[var(--color-text-primary)] shadow-premium relative group overflow-hidden"
             aria-label="Temayı Değiştir"
         >
+            <div className="absolute inset-0 bg-noise opacity-[0.05] pointer-events-none" />
             {theme === 'light' ? (
-                <Moon size={18} className="text-accent-blue" />
+                <Moon size={20} className="text-[var(--color-accent-blue)] relative z-10" fill="currentColor" fillOpacity={0.1} />
             ) : (
-                <Sun size={18} className="text-amber-400" />
+                <Sun size={20} className="text-amber-400 relative z-10" fill="currentColor" fillOpacity={0.2} />
             )}
         </motion.button>
     );

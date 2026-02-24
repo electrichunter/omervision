@@ -111,8 +111,10 @@ export function VoicePlayer({ content, title }: VoicePlayerProps) {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="my-8 p-4 md:p-6 rounded-3xl border border-[var(--color-border)] bg-white/50 backdrop-blur-xl shadow-lg dark:bg-slate-900/50"
+            className="my-12 p-8 rounded-[2.5rem] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] backdrop-blur-3xl shadow-premium relative overflow-hidden group"
         >
+            <div className="absolute inset-0 bg-noise opacity-[0.03] pointer-events-none" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-accent-blue)]/5 blur-[100px] rounded-full -mr-32 -mt-32" />
             <div className="flex flex-col md:flex-row items-center gap-6">
                 {/* Control Button */}
                 <button

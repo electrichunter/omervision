@@ -17,7 +17,7 @@ export interface PaaSProject {
 
 const isServer = typeof window === 'undefined';
 const API_URL = isServer
-  ? (process.env.INTERNAL_API_URL || 'http://backend:8000')
+  ? (process.env.INTERNAL_API_URL || 'http://127.0.0.1:8000')
   : ''; // Use relative path for client-side to leverage Next.js rewrites
 
 class ApiClient {
@@ -53,8 +53,14 @@ class ApiClient {
       }
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error occurred' }));
-        throw new Error(error.detail || response.statusText);
+        let errorDetail = 'Sunucu ile bağlantı kurulamadı (Servis kapalı olabilir)';
+        try {
+          const errorJson = await response.json();
+          if (errorJson.detail) errorDetail = errorJson.detail;
+        } catch (e) {
+          // If response is not JSON, we keep the default errorDetail
+        }
+        throw new Error(errorDetail);
       }
 
       return response.json();
@@ -331,6 +337,18 @@ class ApiClient {
 
   async getTTSStatus(jobId: string): Promise<{ status: string; url?: string; message?: string }> {
     return this.request<{ status: string; url?: string; message?: string }>(`/api/tts/status/${jobId}`);
+  }
+
+  async getContactMessages() {
+    return this.request<any[]>('/api/admin/contact-messages');
+  }
+
+  async markMessageAsRead(id: number) {
+    return this.request(`/api/admin/contact-messages/${id}/read`, { method: 'PATCH' });
+  }
+
+  async deleteContactMessage(id: number) {
+    return this.request(`/api/admin/contact-messages/${id}`, { method: 'DELETE' });
   }
 }
 

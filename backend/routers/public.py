@@ -8,8 +8,8 @@ import json
 import hashlib
 
 from database import get_db, redis_client
-from models import Blog, Project, NewsletterSubscription, PaaSProject
-from schemas import SubscribeRequest, NewsletterCreate
+from models import Blog, Project, NewsletterSubscription, PaaSProject, ContactMessage
+from schemas import SubscribeRequest, NewsletterCreate, ContactCreate
 from config import settings
 
 
@@ -158,3 +158,14 @@ async def get_public_paas_projects(db: AsyncSession = Depends(get_db)):
         select(PaaSProject).filter(PaaSProject.status.in_(["running", "deploying"])).order_by(PaaSProject.created_at.desc())
     )
     return result.scalars().all()
+
+@router.post("/contact")
+async def contact_form(req: ContactCreate, db: AsyncSession = Depends(get_db)):
+    new_msg = ContactMessage(
+        name=req.name,
+        email=req.email,
+        message=req.message
+    )
+    db.add(new_msg)
+    await db.commit()
+    return {"status": "success", "message": "Your message has been received."}

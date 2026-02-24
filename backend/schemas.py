@@ -163,3 +163,18 @@ class PaaSProjectOut(BaseModel):
     updated_at: datetime.datetime
 
     model_config = {"from_attributes": True}
+
+class ContactCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    email: EmailStr
+    message: str = Field(..., min_length=1, max_length=2000)
+
+class ContactOut(BaseModel):
+    id: int
+    name: str
+    email: str
+    message: str
+    is_read: bool
+    created_at: datetime.datetime
+
+    model_config = {"from_attributes": True}

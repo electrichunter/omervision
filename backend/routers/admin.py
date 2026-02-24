@@ -8,8 +8,8 @@ from sqlalchemy.orm import joinedload
 import psutil
 
 from database import get_db, redis_client
-from models import User, Role, UserRole, Permission, RolePermission, Comment, AuditLog
-from schemas import UserCreate, UserOut, RoleCreate, AuditLogOut, CommentOut
+from models import User, Role, UserRole, Permission, RolePermission, Comment, AuditLog, ContactMessage
+from schemas import UserCreate, UserOut, RoleCreate, AuditLogOut, CommentOut, ContactOut
 from security import get_password_hash
 from deps import get_current_user, requires_role, log_audit, check_ip_whitelist
 
@@ -145,4 +145,31 @@ async def get_about(current: User = Depends(requires_role('admin'))):
 async def update_about(request: Request, current: User = Depends(requires_role('admin'))):
     body = await request.json()
     redis_client.set("about_data", json.dumps(body))
+    return {"status": "ok"}
+
+# ─── Contact Messages Management ─────────────────────────────────────────────
+
+@router.get("/contact-messages", response_model=List[ContactOut])
+async def get_contact_messages(db: AsyncSession = Depends(get_db), current: User = Depends(requires_role('admin'))):
+    result = await db.execute(select(ContactMessage).order_by(ContactMessage.created_at.desc()))
+    return result.scalars().all()
+
+@router.patch("/contact-messages/{msg_id}/read")
+async def mark_message_as_read(msg_id: int, db: AsyncSession = Depends(get_db), current: User = Depends(requires_role('admin'))):
+    result = await db.execute(select(ContactMessage).filter(ContactMessage.id == msg_id))
+    msg = result.scalar_one_or_none()
+    if not msg:
+        raise HTTPException(status_code=404, detail="Message not found")
+    msg.is_read = True
+    await db.commit()
+    return {"status": "ok"}
+
+@router.delete("/contact-messages/{msg_id}")
+async def delete_contact_message(msg_id: int, db: AsyncSession = Depends(get_db), current: User = Depends(requires_role('admin'))):
+    result = await db.execute(select(ContactMessage).filter(ContactMessage.id == msg_id))
+    msg = result.scalar_one_or_none()
+    if not msg:
+        raise HTTPException(status_code=404, detail="Message not found")
+    await db.delete(msg)
+    await db.commit()
     return {"status": "ok"}
