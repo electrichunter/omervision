@@ -175,6 +175,7 @@ class ApiClient {
       featured: b.featured || false,
       is_published: b.is_published !== undefined ? b.is_published : true,
       coverImage: b.image,
+      audioUrl: b.audio_url,
     };
   }
 
@@ -328,10 +329,10 @@ class ApiClient {
     });
   }
 
-  async generateTTS(text: string): Promise<{ job_id: string; status: string }> {
+  async generateTTS(text: string, voice?: string): Promise<{ job_id: string; status: string }> {
     return this.request<{ job_id: string; status: string }>('/api/tts/generate', {
       method: 'POST',
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text, voice: voice || 'tr-TR-AhmetNeural' }),
     });
   }
 

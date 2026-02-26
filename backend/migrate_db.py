@@ -13,6 +13,12 @@ async def migrate_schemas():
             
         # Update Blogs table  
         try:
+            print("Adding audio_url column to blogs...")
+            await conn.execute(text("ALTER TABLE blogs ADD COLUMN audio_url VARCHAR(255);"))
+        except Exception as e:
+            print(f"Blogs audio_url tweak error: {e}")
+            
+        try:
             print("Updating blogs.date format...")
             await conn.execute(text("ALTER TABLE blogs MODIFY COLUMN date DATETIME;"))
         except Exception as e:

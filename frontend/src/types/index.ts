@@ -26,6 +26,7 @@ export interface BlogPost {
   featured: boolean;
   coverImage?: string;
   is_published?: boolean;
+  audioUrl?: string;
 }
 
 export interface Skill {

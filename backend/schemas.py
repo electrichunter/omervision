@@ -55,6 +55,7 @@ class BlogCreate(BaseModel):
     content: str
     featured: bool = False
     is_published: bool = True
+    audio_url: Optional[str] = None
 
 class BlogOut(BaseModel):
     id: int
@@ -71,6 +72,7 @@ class BlogOut(BaseModel):
     readingTime: Optional[int] = 5
     featured: bool = False
     is_published: bool = True
+    audio_url: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

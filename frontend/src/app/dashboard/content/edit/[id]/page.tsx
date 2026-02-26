@@ -22,6 +22,8 @@ export default function EditContentPage() {
     const [uploading, setUploading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [isPublished, setIsPublished] = useState(true);
+    const [audioUrl, setAudioUrl] = useState('');
+    const [selectedVoice, setSelectedVoice] = useState('none');
 
     const titleInputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -37,6 +39,7 @@ export default function EditContentPage() {
                 setExcerpt(blog.excerpt || '');
                 setCoverImage(blog.coverImage || '');
                 setIsPublished(blog.is_published ?? true);
+                setAudioUrl(blog.audioUrl || '');
             } catch (err) {
                 console.error(err);
                 alert('Blog bulunamadı veya yüklenemedi.');
@@ -70,7 +73,38 @@ export default function EditContentPage() {
             return;
         }
         setSaving(true);
+        let finalAudioUrl = audioUrl;
+
         try {
+            if (selectedVoice !== 'none') {
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = content;
+                const plainText = tempDiv.textContent || tempDiv.innerText || "";
+
+                const res = await api.generateTTS(plainText, selectedVoice);
+
+                let attempts = 0;
+                let generatedUrl = '';
+                while (attempts < 60) {
+                    attempts++;
+                    const statusRes = await api.getTTSStatus(res.job_id);
+                    if (statusRes.status === 'complete' && statusRes.url) {
+                        generatedUrl = statusRes.url;
+                        break;
+                    } else if (statusRes.status === 'failed') {
+                        throw new Error("Ses oluşturma başarısız oldu.");
+                    }
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+
+                if (!generatedUrl) {
+                    throw new Error("Ses oluşturma zaman aşımına uğradı.");
+                }
+
+                finalAudioUrl = generatedUrl;
+                setAudioUrl(finalAudioUrl);
+            }
+
             await api.updateBlog(id, {
                 title,
                 slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
@@ -79,17 +113,20 @@ export default function EditContentPage() {
                 excerpt,
                 image: coverImage,
                 featured: false,
-                is_published: isPublished
+                is_published: isPublished,
+                audio_url: finalAudioUrl
             });
             alert('İçerik başarıyla güncellendi!');
             router.push('/dashboard/content');
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            alert('İçerik güncellenirken hata oluştu');
+            alert(err.message || 'İçerik güncellenirken hata oluştu');
         } finally {
             setSaving(false);
         }
     };
+
+
 
     // Auto resize title text area to feel like Medium
     useEffect(() => {
@@ -131,7 +168,7 @@ export default function EditContentPage() {
                         disabled={saving || !title || !content || content === '<p></p>'}
                         className="px-5 py-2 bg-[var(--color-accent-blue)] hover:bg-[var(--color-accent-blue)]/90 rounded-md font-medium transition-colors disabled:opacity-50 text-white text-sm flex items-center gap-2 shadow-sm"
                     >
-                        {saving ? '⏳ Güncelleniyor...' : 'Güncelle'}
+                        {saving ? (selectedVoice !== 'none' ? '⏳ Ses Oluşturuluyor & Güncelleniyor...' : '⏳ Güncelleniyor...') : 'Güncelle'}
                     </button>
                 </div>
             </header>
@@ -224,6 +261,29 @@ export default function EditContentPage() {
                                         className="w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-md px-5 py-4 text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:border-[var(--color-accent-blue)] outline-none transition-colors"
                                         placeholder="Teknoloji, Kodlama (virgülle ayırın)"
                                     />
+                                </div>
+                            </div>
+
+                            <div className="pt-4 border-t border-[var(--color-border)] mt-2">
+                                <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3">Yazı Seslendirmesi</label>
+                                <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                                    <select
+                                        value={selectedVoice}
+                                        onChange={e => setSelectedVoice(e.target.value)}
+                                        className="bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-md px-4 py-2.5 text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-blue)] text-sm"
+                                    >
+                                        <option value="none">Ses Oluşturma (Mevcut Ses Korunur)</option>
+                                        <option value="tr-TR-AhmetNeural">Türkçe (Erkek)</option>
+                                        <option value="tr-TR-EmelNeural">Türkçe (Kadın)</option>
+                                        <option value="en-US-JennyNeural">İngilizce (Kadın)</option>
+                                        <option value="en-US-GuyNeural">İngilizce (Erkek)</option>
+                                        <option value="de-DE-KatjaNeural">Almanca (Kadın)</option>
+                                    </select>
+                                    {audioUrl && (
+                                        <div className="flex-1 w-full mt-2 md:mt-0">
+                                            <audio controls src={audioUrl} className="w-full h-10 rounded-md outline-none" />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>

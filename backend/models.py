@@ -141,6 +141,7 @@ class Blog(Base):
     readingTime = Column(Integer, default=5)
     featured = Column(Boolean, default=False)
     is_published = Column(Boolean, default=True)
+    audio_url = Column(String(255), nullable=True)
 
     __table_args__ = (
         Index('ix_blog_fulltext', 'title', 'excerpt', mysql_prefix='FULLTEXT'),

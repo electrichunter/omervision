@@ -86,6 +86,7 @@ async def update_blog(blog_id: int, blog: BlogCreate, request: Request, db: Asyn
     existing_blog.content = blog.content
     existing_blog.featured = blog.featured
     existing_blog.is_published = blog.is_published
+    existing_blog.audio_url = blog.audio_url
     
     word_count = len(blog.content.split())
     minutes = max(1, round(word_count / 200))
