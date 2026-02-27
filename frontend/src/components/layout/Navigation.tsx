@@ -41,8 +41,8 @@ export function Navigation() {
         <nav className="flex items-center justify-between h-20 md:h-24">
           {/* Logo Section */}
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 bg-[var(--color-accent-blue)] rounded-md flex items-center justify-center text-white font-black text-xl shadow-sm transition-all duration-300">
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="w-8 h-8 bg-[var(--color-accent)] flex items-center justify-center text-[var(--color-bg-primary)] font-black text-xl shadow-sm transition-all duration-300">
                 O
               </div>
               <span className="text-xl font-black tracking-tighter text-[var(--color-text-primary)]">
@@ -50,58 +50,60 @@ export function Navigation() {
               </span>
             </Link>
             {isMaintenance && (
-              <span className="hidden sm:flex items-center gap-2 px-3 py-1 text-[10px] font-black uppercase tracking-[0.15em] rounded-full bg-[#FF3B00]/10 text-[#FF3B00] border border-[#FF3B00]/20 animate-pulse">
-                <Info size={12} />
+              <span className="hidden sm:flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-[0.15em] bg-[var(--color-surface)] text-[var(--color-accent)] border border-[var(--color-accent)]">
+                <Info size={16} />
                 Bakım Modu
               </span>
             )}
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-4">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="px-5 py-2.5 text-xs font-black uppercase tracking-[0.2em] text-[var(--color-text-secondary)] hover:text-[var(--color-accent-blue)] transition-colors rounded-md hover:bg-[var(--color-accent-blue)]/5"
+                className="px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-all active:scale-95 hover:bg-[var(--color-surface)]"
               >
                 {item.name}
               </Link>
             ))}
 
-            <div className="h-6 w-px bg-[var(--color-border)] mx-4" />
+            <div className="h-8 w-px bg-[var(--color-border)] mx-2" />
 
             <ThemeToggle />
 
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="p-3 text-[var(--color-text-secondary)] hover:text-[#00BEFF] transition-all rounded-md hover:bg-[#00BEFF]/10"
+              className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-all active:scale-95 hover:bg-[var(--color-surface)]"
               aria-label="Search"
             >
-              <Search size={20} />
+              <Search size={24} />
             </button>
 
             <Link
               href="/login"
-              className="ml-4 px-6 py-3 bg-[var(--color-accent-blue)] text-white text-[10px] font-black uppercase tracking-widest rounded-md shadow-sm hover:opacity-90 transition-all"
+              className="ml-2 px-8 py-4 bg-[var(--color-accent)] text-[var(--color-bg-primary)] text-xs font-black uppercase tracking-widest shadow-sm hover:opacity-90 transition-all"
             >
               Dashboard
             </Link>
           </div>
 
           {/* Mobile Menu Actions */}
-          <div className="flex items-center gap-3 md:hidden">
-            <ThemeToggle />
+          <div className="flex items-center gap-2 md:hidden">
+            <div className="w-12 h-12 flex items-center justify-center">
+              <ThemeToggle />
+            </div>
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="p-3 text-[var(--color-text-secondary)] hover:text-[#00BEFF] transition-all rounded-md hover:bg-[#00BEFF]/10"
+              className="w-12 h-12 flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-all active:scale-95 hover:bg-[var(--color-surface)]"
               aria-label="Search"
             >
-              <Search size={22} />
+              <Search size={24} />
             </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-3 text-[var(--color-text-primary)] bg-[var(--color-bg-secondary)] rounded-md border border-[var(--color-border)] shadow-sm"
+              className="w-12 h-12 flex items-center justify-center text-[var(--color-text-primary)] bg-[var(--color-surface)] border border-[var(--color-border)] transition-all active:scale-95 shadow-sm"
               aria-label="Toggle menu"
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -133,9 +135,9 @@ export function Navigation() {
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="fixed top-0 right-0 bottom-0 w-[80%] max-w-[400px] z-50 bg-[var(--color-bg-primary)] p-8 flex flex-col shadow-2xl md:hidden"
             >
-              <div className="flex items-center justify-between mb-12">
-                <div className="w-10 h-10 bg-[var(--color-accent-blue)] rounded-md flex items-center justify-center text-white font-black text-xl shadow-sm">O</div>
-                <button onClick={() => setIsOpen(false)} className="p-3 bg-[var(--color-bg-secondary)] rounded-md border border-[var(--color-border)]">
+              <div className="flex items-center justify-between mb-16">
+                <div className="w-12 h-12 bg-[var(--color-accent)] flex items-center justify-center text-[var(--color-bg-primary)] font-black text-xl shadow-sm">O</div>
+                <button onClick={() => setIsOpen(false)} className="w-12 h-12 flex items-center justify-center bg-[var(--color-surface)] border border-[var(--color-border)] active:scale-95 transition-all">
                   <X size={24} />
                 </button>
               </div>
@@ -151,7 +153,7 @@ export function Navigation() {
                     <Link
                       href={item.href}
                       onClick={() => setIsOpen(false)}
-                      className="text-2xl font-black tracking-tighter text-[var(--color-text-primary)] hover:text-[var(--color-accent-blue)] transition-colors"
+                      className="text-2xl font-black tracking-tighter text-[var(--color-text-primary)] hover:text-[var(--color-accent)] transition-all"
                     >
                       {item.name}
                     </Link>
@@ -159,18 +161,18 @@ export function Navigation() {
                 ))}
               </div>
 
-              <div className="mt-auto pt-10 flex flex-col gap-4">
+              <div className="mt-auto pt-8 flex flex-col gap-4">
                 <Link
                   href="/login"
                   onClick={() => setIsOpen(false)}
-                  className="w-full h-16 bg-[var(--color-accent-blue)] text-white flex items-center justify-center font-black uppercase tracking-[0.2em] text-xs rounded-md shadow-sm"
+                  className="w-full h-16 bg-[var(--color-accent)] text-[var(--color-bg-primary)] flex items-center justify-center font-black uppercase tracking-[0.2em] text-xs shadow-sm active:scale-95 transition-all hover:opacity-90"
                 >
                   Admin Paneli
                 </Link>
                 <Link
                   href="/register"
                   onClick={() => setIsOpen(false)}
-                  className="w-full h-16 bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] border border-[var(--color-border)] flex items-center justify-center font-black uppercase tracking-[0.2em] text-xs rounded-md hover:bg-[var(--color-bg-tertiary)]"
+                  className="w-full h-16 bg-[var(--color-surface)] text-[var(--color-text-primary)] border border-[var(--color-border)] flex items-center justify-center font-black uppercase tracking-[0.2em] text-xs hover:bg-[var(--color-bg-primary)] active:scale-95 transition-all"
                 >
                   Kayıt Ol
                 </Link>

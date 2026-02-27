@@ -27,7 +27,7 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="mb-12"
+            className="mb-16"
           >
             <div className="flex items-center justify-center gap-4">
               {socialLinks.map((social) => (
@@ -36,7 +36,7 @@ export function Hero() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-6 py-2.5 rounded-md bg-[var(--color-bg-tertiary)]/50 backdrop-blur-xl border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-accent-blue)] hover:border-[var(--color-accent-blue)]/50 transition-colors flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em]"
+                  className="px-8 py-2 rounded-none bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)] transition-all active:scale-95 flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em]"
                 >
                   <social.icon size={16} />
                   {social.label}
@@ -50,9 +50,9 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-10 leading-[0.85] text-[var(--color-text-primary)] font-heading"
+            className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-8 leading-[0.85] text-[var(--color-text-primary)] font-heading"
           >
-            <span className="inline-block text-[var(--color-accent-blue)] filter drop-shadow-[0_10px_30px_rgba(0,190,255,0.2)]">
+            <span className="inline-block text-[var(--color-accent)]">
               İmkansızı
             </span>
             <br />
@@ -66,12 +66,13 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.5 }}
-            className="text-xl sm:text-2xl text-[var(--color-text-secondary)] max-w-3xl mx-auto mb-16 leading-[1.6] font-medium tracking-tight"
+            className="text-lg sm:text-xl text-[var(--color-text-secondary)] max-w-2xl mx-auto mb-16 leading-relaxed font-medium tracking-tight flex flex-col gap-2"
           >
-            Geleceğin dijital mimarisini bugünden kurun.
-            <span className="text-[var(--color-text-primary)] font-black"> PaaS mimarileri</span> ve
-            <span className="text-[var(--color-text-primary)] font-black"> yüksek performanslı veri hatları</span> ile
-            sınırları zorluyoruz.
+            <span>Geleceğin dijital mimarisini bugünden kurun.</span>
+            <span>
+              <span className="text-[var(--color-text-primary)] font-bold">PaaS mimarileri</span> ve{" "}
+              <span className="text-[var(--color-text-primary)] font-bold">yüksek performanslı veri hatları</span> ile sınırları zorluyoruz.
+            </span>
           </motion.p>
 
           {/* CTA Buttons */}
@@ -79,17 +80,17 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-24"
+            className="flex flex-col sm:flex-row items-center justify-center gap-8 mb-24"
           >
             <Link href="/projects" className="w-full sm:w-auto">
-              <Button size="lg" className="relative w-full sm:w-auto gap-4 h-20 px-10 rounded-md bg-[var(--color-accent-blue)] text-white hover:bg-[var(--color-accent-blue)]/90 transition-colors font-black uppercase tracking-widest text-xs border-none active:scale-95 shadow-sm">
-                <Rocket size={22} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              <Button size="lg" className="relative w-full sm:w-auto gap-2 h-16 px-8 rounded-none bg-[var(--color-accent)] text-[var(--color-bg-primary)] hover:opacity-90 transition-all font-black uppercase tracking-widest text-xs border-none active:scale-95 shadow-sm">
+                <Rocket size={18} />
                 Projelerimi Keşfet
               </Button>
             </Link>
             <Link href="/contact" className="w-full sm:w-auto">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto gap-4 h-20 px-10 rounded-md border border-[var(--color-border)] hover:bg-[var(--color-bg-tertiary)] transition-colors font-black uppercase tracking-widest text-xs active:scale-95">
-                <Terminal size={22} />
+              <Button variant="outline" size="lg" className="w-full sm:w-auto gap-2 h-16 px-8 rounded-none border border-[var(--color-border)] hover:bg-[var(--color-surface)] transition-all font-black uppercase tracking-widest text-xs active:scale-95">
+                <Terminal size={18} />
                 Temasa Geç
               </Button>
             </Link>
@@ -101,19 +102,19 @@ export function Hero() {
 
       {/* Scroll indicator - Refined */}
       <motion.div
-        animate={{ y: [0, 10, 0] }}
+        animate={{ y: [0, 8, 0] }}
         transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 cursor-pointer hidden sm:flex flex-col items-center gap-3"
+        className="absolute bottom-16 left-1/2 -translate-x-1/2 cursor-pointer hidden sm:flex flex-col items-center gap-2"
       >
-        <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--color-text-muted)] opacity-50">Scoll</span>
-        <div className="w-8 h-14 rounded-full border-2 border-[var(--color-accent-blue)]/30 flex items-start justify-center p-2 backdrop-blur-md">
+        <span className="text-xs font-black uppercase tracking-[0.5em] text-[var(--color-text-secondary)]">Scoll</span>
+        <div className="w-8 h-16 border-2 border-[var(--color-border)] flex items-start justify-center p-2">
           <motion.div
             animate={{
               y: [0, 16, 0],
               opacity: [1, 0, 1]
             }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="w-1.5 h-3 rounded-full bg-[var(--color-accent-blue)]"
+            className="w-2 h-4 bg-[var(--color-accent)]"
           />
         </div>
       </motion.div>
