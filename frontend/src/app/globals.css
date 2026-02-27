@@ -3,16 +3,16 @@
 @theme {
   --font-sans: "Inter", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 
-  /* Vercel-like Pure Dark Minimal Palette */
-  --color-bg-primary: #000000;
-  --color-surface: #111111;
-  --color-border: #333333;
+  /* Nordic Slate (Modern Tech Blog) - Light Mode */
+  --color-bg-primary: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-border: #E2E8F0;
 
-  --color-text-primary: #EDEDED;
-  --color-text-secondary: #888888;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
 
-  /* Vercel Blue */
-  --color-accent: #0070F3;
+  /* Sky Blue Accent */
+  --color-accent: #0284C7;
 
   --ease-spring: cubic-bezier(0.34, 1.7, 0.64, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
@@ -20,15 +20,17 @@
   --duration-normal: 300ms;
 }
 
-/* We flip to a light-mode inverse via .dark but since the prompt asked for "neredeyse tamamen siyah", we will make .dark keep the black and the default keep the black to ensure persistence of the requested visual language, or we can just map .dark to the exact same or slightly adjusted variables to be safe. */
+/* Dark Mode - Cohesive Slate Tones */
 .dark {
-  --color-bg-primary: #000000;
-  --color-surface: #0a0a0a;
-  --color-border: #333333;
+  --color-bg-primary: #0F172A;
+  --color-surface: #1E293B;
+  --color-border: #334155;
 
-  --color-text-primary: #EDEDED;
-  --color-text-secondary: #888888;
-  --color-accent: #0070F3;
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+
+  /* Bright Sky Blue Accent for Dark Mode */
+  --color-accent: #38BDF8;
 }
 
 @layer base {
@@ -63,7 +65,6 @@
 ::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border: 2px solid var(--color-bg-primary);
-  /* Adjusted from 4px to 2px for better visibility in dark mode within 8px width */
 }
 
 ::-webkit-scrollbar-thumb:hover {

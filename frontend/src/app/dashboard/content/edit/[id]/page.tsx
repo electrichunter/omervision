@@ -134,14 +134,14 @@ export default function EditContentPage() {
                             type="checkbox"
                             checked={isPublished}
                             onChange={(e) => setIsPublished(e.target.checked)}
-                            className="bg-transparent border-[var(--color-border)] rounded accent-[var(--color-accent-blue)] w-4 h-4 cursor-pointer"
+                            className="bg-transparent border-[var(--color-border)] rounded accent-[var(--color-accent)] w-4 h-4 cursor-pointer"
                         />
                         Aktif Yayın
                     </label>
                     <button
                         onClick={handleSubmit}
                         disabled={saving || !title || !content || content === '<p></p>'}
-                        className="px-5 py-2 bg-[var(--color-accent-blue)] hover:bg-[var(--color-accent-blue)]/90 rounded-md font-medium transition-colors disabled:opacity-50 text-white text-sm flex items-center gap-2 shadow-sm"
+                        className="px-5 py-2 bg-[var(--color-accent)] hover:opacity-90 rounded-none font-medium transition-all disabled:opacity-50 text-white text-sm flex items-center gap-2 shadow-sm"
                     >
                         {saving ? '⏳ Güncelleniyor...' : 'Güncelle'}
                     </button>
@@ -161,7 +161,7 @@ export default function EditContentPage() {
                             onChange={(e) => {
                                 setTitle(e.target.value);
                             }}
-                            className="w-full bg-transparent text-4xl md:text-5xl lg:text-6xl font-black text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] placeholder-opacity-50 outline-none resize-none overflow-hidden leading-tight"
+                            className="w-full bg-transparent text-4xl md:text-5xl lg:text-6xl font-black text-[var(--color-text-primary)] placeholder-[var(--color-text-secondary)] placeholder-opacity-50 outline-none resize-none overflow-hidden leading-tight"
                             placeholder="Başlık..."
                             rows={1}
                         />
@@ -180,7 +180,7 @@ export default function EditContentPage() {
                             </div>
                         ) : (
                             <div className="flex items-center gap-4">
-                                <label className="inline-flex items-center gap-2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] cursor-pointer transition-colors px-4 py-2.5 rounded-md border border-[var(--color-border)] bg-[var(--color-bg-secondary)] hover:border-[var(--color-accent-blue)]/50 text-sm font-medium shadow-sm">
+                                <label className="inline-flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] cursor-pointer transition-colors px-4 py-2.5 rounded-none border border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-accent)]/50 text-sm font-medium shadow-sm">
                                     <ImageIcon size={18} />
                                     <span>Kapak Resmi Ekle</span>
                                     <input type="file" accept="image/*" onChange={handleCoverImageUpload} className="hidden" />
@@ -198,9 +198,9 @@ export default function EditContentPage() {
                         />
                     </div>
 
-                    <div className="mt-32 pt-10 border-t border-[var(--color-border)] space-y-8 bg-[var(--color-bg-secondary)] p-8 rounded-lg shadow-sm">
+                    <div className="mt-32 pt-10 border-t border-[var(--color-border)] space-y-8 bg-[var(--color-surface)] p-8 rounded-none shadow-sm">
                         <h3 className="text-xl font-bold flex items-center gap-3 text-[var(--color-text-primary)]">
-                            <Settings size={22} className="text-[var(--color-accent-blue)]" /> Yayın Ayarları
+                            <Settings size={22} className="text-[var(--color-accent)]" /> Yayın Ayarları
                         </h3>
 
                         <div className="grid gap-6">
@@ -209,7 +209,7 @@ export default function EditContentPage() {
                                 <textarea
                                     value={excerpt}
                                     onChange={(e) => setExcerpt(e.target.value)}
-                                    className="w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-md px-5 py-4 text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:border-[var(--color-accent-blue)] outline-none transition-colors resize-none h-28"
+                                    className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border)] rounded-none px-5 py-4 text-[var(--color-text-primary)] placeholder-[var(--color-text-secondary)] focus:border-[var(--color-accent)] outline-none transition-colors resize-none h-28"
                                     placeholder="Yazının kısa bir özeti..."
                                 />
                             </div>
@@ -218,12 +218,12 @@ export default function EditContentPage() {
                                 <div>
                                     <label className="block text-sm font-semibold text-[var(--color-text-secondary)] mb-3">Özel URL (Slug)</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] text-sm">/blog/</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)] text-sm">/blog/</span>
                                         <input
                                             type="text"
                                             value={slug}
                                             onChange={(e) => setSlug(e.target.value)}
-                                            className="w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-md pl-14 pr-5 py-4 text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:border-[var(--color-accent-blue)] outline-none transition-colors font-mono text-sm"
+                                            className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border)] rounded-none pl-14 pr-5 py-4 text-[var(--color-text-primary)] placeholder-[var(--color-text-secondary)] focus:border-[var(--color-accent)] outline-none transition-colors font-mono text-sm"
                                         />
                                     </div>
                                 </div>
@@ -233,7 +233,7 @@ export default function EditContentPage() {
                                         type="text"
                                         value={tags}
                                         onChange={(e) => setTags(e.target.value)}
-                                        className="w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-md px-5 py-4 text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:border-[var(--color-accent-blue)] outline-none transition-colors"
+                                        className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border)] rounded-none px-5 py-4 text-[var(--color-text-primary)] placeholder-[var(--color-text-secondary)] focus:border-[var(--color-accent)] outline-none transition-colors"
                                         placeholder="Teknoloji, Kodlama (virgülle ayırın)"
                                     />
                                 </div>
@@ -245,14 +245,14 @@ export default function EditContentPage() {
                                     <select
                                         value={selectedVoice}
                                         onChange={e => setSelectedVoice(e.target.value)}
-                                        className="bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] rounded-md px-4 py-2.5 text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-blue)] text-sm"
+                                        className="bg-[var(--color-bg-primary)] border border-[var(--color-border)] rounded-none px-4 py-2.5 text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent)] text-sm"
                                     >
-                                        <option value="none">Ses Oluşturma (Mevcut Ses Korunur)</option>
-                                        <option value="tr-TR-AhmetNeural">Türkçe (Erkek)</option>
-                                        <option value="tr-TR-EmelNeural">Türkçe (Kadın)</option>
-                                        <option value="en-US-JennyNeural">İngilizce (Kadın)</option>
-                                        <option value="en-US-GuyNeural">İngilizce (Erkek)</option>
-                                        <option value="de-DE-KatjaNeural">Almanca (Kadın)</option>
+                                        <option value="none" className="bg-[var(--color-surface)] text-[var(--color-text-primary)]">Ses Oluşturma (Mevcut Ses Korunur)</option>
+                                        <option value="tr-TR-AhmetNeural" className="bg-[var(--color-surface)] text-[var(--color-text-primary)]">Türkçe (Erkek)</option>
+                                        <option value="tr-TR-EmelNeural" className="bg-[var(--color-surface)] text-[var(--color-text-primary)]">Türkçe (Kadın)</option>
+                                        <option value="en-US-JennyNeural" className="bg-[var(--color-surface)] text-[var(--color-text-primary)]">İngilizce (Kadın)</option>
+                                        <option value="en-US-GuyNeural" className="bg-[var(--color-surface)] text-[var(--color-text-primary)]">İngilizce (Erkek)</option>
+                                        <option value="de-DE-KatjaNeural" className="bg-[var(--color-surface)] text-[var(--color-text-primary)]">Almanca (Kadın)</option>
                                     </select>
                                     {audioUrl && (
                                         <div className="flex-1 w-full mt-2 md:mt-0">
