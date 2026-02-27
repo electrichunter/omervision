@@ -4,6 +4,7 @@ redis_data/
 minio_data/
 .env
 .env.*
+!.env.example
 *.json.bak
 
 # ─── Python / Backend ────────────────────────────────────────────────────────
