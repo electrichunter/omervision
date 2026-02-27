@@ -14,9 +14,9 @@ async def generate_tts(request: Request, body: TTSRequest):
     if not body.text:
         raise HTTPException(status_code=400, detail="Text is required")
     
-    # Enqueue the task
+    # Enqueue the task with blog_id=0 or None to prevent string from taking the blog_id slot
     pool = request.app.state.arq_pool
-    job = await pool.enqueue_job('generate_tts_task', body.text, body.voice)
+    job = await pool.enqueue_job('generate_tts_task', 0, body.text, body.voice)
     
     return {"job_id": job.job_id, "status": "pending"}
 

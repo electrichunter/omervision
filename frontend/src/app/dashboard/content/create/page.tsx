@@ -48,35 +48,7 @@ export default function CreateContentPage() {
         let finalAudioUrl = audioUrl;
 
         try {
-            if (selectedVoice !== 'none') {
-                const tempDiv = document.createElement("div");
-                tempDiv.innerHTML = content;
-                const plainText = tempDiv.textContent || tempDiv.innerText || "";
-
-                const res = await api.generateTTS(plainText, selectedVoice);
-
-                let attempts = 0;
-                let generatedUrl = '';
-                while (attempts < 60) {
-                    attempts++;
-                    const statusRes = await api.getTTSStatus(res.job_id);
-                    if (statusRes.status === 'complete' && statusRes.url) {
-                        generatedUrl = statusRes.url;
-                        break;
-                    } else if (statusRes.status === 'failed') {
-                        throw new Error("Ses oluşturma başarısız oldu.");
-                    }
-                    await new Promise(r => setTimeout(r, 2000));
-                }
-
-                if (!generatedUrl) {
-                    throw new Error("Ses oluşturma zaman aşımına uğradı.");
-                }
-
-                finalAudioUrl = generatedUrl;
-                setAudioUrl(finalAudioUrl);
-            }
-
+            // Background task handles TTS now
             await api.createBlog({
                 title,
                 slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
@@ -86,7 +58,9 @@ export default function CreateContentPage() {
                 image: coverImage,
                 featured: false,
                 is_published: isPublished,
-                audio_url: finalAudioUrl
+                audio_url: audioUrl,
+                generate_audio: selectedVoice !== 'none',
+                voice: selectedVoice !== 'none' ? selectedVoice : undefined
             });
             alert('İçerik başarıyla oluşturuldu!');
             router.push('/dashboard/content');
@@ -133,7 +107,7 @@ export default function CreateContentPage() {
                         disabled={saving || !title || !content || content === '<p></p>'}
                         className="px-5 py-2 bg-[var(--color-accent-blue)] hover:bg-[var(--color-accent-blue)]/90 rounded-md font-medium transition-colors disabled:opacity-50 text-white text-sm flex items-center gap-2 shadow-sm"
                     >
-                        {saving ? (selectedVoice !== 'none' && !audioUrl ? '⏳ Ses Oluşturuluyor & Kaydediliyor...' : '⏳ Kaydediliyor...') : 'Kaydet'}
+                        {saving ? '⏳ Kaydediliyor...' : 'Kaydet'}
                     </button>
                 </div>
             </header>
@@ -260,6 +234,6 @@ export default function CreateContentPage() {
                     </div>
                 </motion.div>
             </main>
-        </div>
+        </div >
     );
 }

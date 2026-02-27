@@ -1,73 +1,19 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Play, Pause, Volume2, VolumeX, Loader2, Sparkles } from "lucide-react";
+import { useState, useRef } from "react";
+import { Play, Pause, Volume2, VolumeX, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { api } from "@/lib/api";
-import { springPresets } from "@/lib/animations";
 
 interface VoicePlayerProps {
-    content: string;
-    title: string;
+    audioUrl: string;
+    title?: string;
 }
 
-export function VoicePlayer({ content, title }: VoicePlayerProps) {
-    const [audioUrl, setAudioUrl] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+export function VoicePlayer({ audioUrl, title }: VoicePlayerProps) {
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
     const [isMuted, setIsMuted] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
-
-    const handleGenerate = async () => {
-        if (audioUrl) {
-            togglePlay();
-            return;
-        }
-
-        setLoading(true);
-        try {
-            // Remove HTML tags for TTS
-            const cleanText = content.replace(/<[^>]*>?/gm, '');
-            const { job_id } = await api.generateTTS(cleanText);
-
-            // Start Polling
-            let attempts = 0;
-            const maxAttempts = 60; // 60 seconds timeout
-
-            const poll = async () => {
-                if (attempts >= maxAttempts) {
-                    setLoading(false);
-                    return;
-                }
-
-                try {
-                    const status = await api.getTTSStatus(job_id);
-                    if (status.status === "completed" && status.url) {
-                        setAudioUrl(status.url);
-                        setIsPlaying(true);
-                        setLoading(false);
-                    } else if (status.status === "error") {
-                        console.error("TTS Job Error:", status.message);
-                        setLoading(false);
-                    } else {
-                        // Still pending/queued/deferred
-                        attempts++;
-                        setTimeout(poll, 2000); // Poll every 2 seconds
-                    }
-                } catch (e) {
-                    console.error("Polling Error:", e);
-                    setLoading(false);
-                }
-            };
-
-            poll();
-
-        } catch (error) {
-            console.error("Failed to generate voice:", error);
-            setLoading(false);
-        }
-    };
 
     const togglePlay = () => {
         if (audioRef.current) {
@@ -107,6 +53,8 @@ export function VoicePlayer({ content, title }: VoicePlayerProps) {
         }
     };
 
+    if (!audioUrl) return null;
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -118,21 +66,11 @@ export function VoicePlayer({ content, title }: VoicePlayerProps) {
             <div className="flex flex-col md:flex-row items-center gap-6">
                 {/* Control Button */}
                 <button
-                    onClick={handleGenerate}
-                    disabled={loading}
-                    className="relative group w-16 h-16 flex-shrink-0 flex items-center justify-center rounded-2xl bg-[var(--color-accent-blue)] text-white shadow-xl shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                    onClick={togglePlay}
+                    className="relative group w-16 h-16 flex-shrink-0 flex items-center justify-center rounded-2xl bg-[var(--color-accent-blue)] text-white shadow-xl shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all"
                 >
                     <AnimatePresence mode="wait">
-                        {loading ? (
-                            <motion.div
-                                key="loading"
-                                initial={{ opacity: 0, rotate: -180 }}
-                                animate={{ opacity: 1, rotate: 0 }}
-                                exit={{ opacity: 0, rotate: 180 }}
-                            >
-                                <Loader2 className="animate-spin" size={28} />
-                            </motion.div>
-                        ) : isPlaying ? (
+                        {isPlaying ? (
                             <motion.div
                                 key="pause"
                                 initial={{ opacity: 0, scale: 0.5 }}
@@ -158,7 +96,7 @@ export function VoicePlayer({ content, title }: VoicePlayerProps) {
                     <div className="flex items-center justify-between">
                         <div>
                             <h4 className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">
-                                Yapay Zeka ile Dinle
+                                {title || 'Yapay Zeka ile Dinle'}
                             </h4>
                             <p className="text-xs text-[var(--color-text-muted)] flex items-center gap-1.5">
                                 <Sparkles size={12} className="text-amber-400" />
@@ -191,17 +129,15 @@ export function VoicePlayer({ content, title }: VoicePlayerProps) {
                 </div>
             </div>
 
-            {audioUrl && (
-                <audio
-                    ref={audioRef}
-                    src={audioUrl}
-                    onTimeUpdate={handleTimeUpdate}
-                    onEnded={handleEnded}
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
-                    className="hidden"
-                />
-            )}
+            <audio
+                ref={audioRef}
+                src={audioUrl}
+                onTimeUpdate={handleTimeUpdate}
+                onEnded={handleEnded}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                className="hidden"
+            />
         </motion.div>
     );
 }

@@ -108,11 +108,11 @@ services:
     networks:
       - app-network
 
-  worker:
+  tts_worker:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: blog_worker
+    container_name: tts_worker
     restart: always
     volumes:
       - ./backend:/app

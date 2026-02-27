@@ -94,8 +94,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </FadeIn>
           )}
 
-          {/* AI Voice Player */}
-          <VoicePlayer content={post.content} title={post.title} />
+          {/* AI Voice Player (Only shows if generated) */}
+          {post.audioUrl && (
+            <VoicePlayer audioUrl={post.audioUrl} title={post.title} />
+          )}
 
           {/* Content */}
           <FadeIn delay={0.3}>

@@ -56,6 +56,8 @@ class BlogCreate(BaseModel):
     featured: bool = False
     is_published: bool = True
     audio_url: Optional[str] = None
+    generate_audio: bool = False
+    voice: Optional[str] = None
 
 class BlogOut(BaseModel):
     id: int

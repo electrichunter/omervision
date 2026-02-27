@@ -34,8 +34,9 @@ async def get_blogs(cursor: int = None, limit: int = 10, include_drafts: bool = 
     return blogs
 
 @router.post("", response_model=BlogOut)
-async def create_blog(blog: BlogCreate, db: AsyncSession = Depends(get_db), current: User = Depends(requires_role('admin'))):
-    new_blog = Blog(**blog.model_dump())
+async def create_blog(request: Request, blog: BlogCreate, db: AsyncSession = Depends(get_db), current: User = Depends(requires_role('admin'))):
+    blog_data = blog.model_dump(exclude={'generate_audio', 'voice'})
+    new_blog = Blog(**blog_data)
     new_blog.author = current.display_name
     new_blog.date = datetime.datetime.utcnow()
     new_blog.href = f"/blog/{blog.slug}"
@@ -48,6 +49,11 @@ async def create_blog(blog: BlogCreate, db: AsyncSession = Depends(get_db), curr
         await db.commit()
         await db.refresh(new_blog)
         invalidate_blog_cache()
+        if blog.generate_audio:
+            import re
+            plain_text = re.sub(r'<[^>]+>', '', blog.content)
+            pool = request.app.state.arq_pool
+            await pool.enqueue_job('generate_tts_task', new_blog.id, plain_text, blog.voice or "tr-TR-AhmetNeural")
     except Exception as e:
         await db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
@@ -86,7 +92,8 @@ async def update_blog(blog_id: int, blog: BlogCreate, request: Request, db: Asyn
     existing_blog.content = blog.content
     existing_blog.featured = blog.featured
     existing_blog.is_published = blog.is_published
-    existing_blog.audio_url = blog.audio_url
+    if not blog.generate_audio:
+        existing_blog.audio_url = blog.audio_url
     
     word_count = len(blog.content.split())
     minutes = max(1, round(word_count / 200))
@@ -97,6 +104,11 @@ async def update_blog(blog_id: int, blog: BlogCreate, request: Request, db: Asyn
         await db.refresh(existing_blog)
         invalidate_blog_cache()
         await log_audit(db, current.id, "UPDATE_BLOG", f"Blog:{blog_id}", request)
+        if blog.generate_audio:
+            import re
+            plain_text = re.sub(r'<[^>]+>', '', blog.content)
+            pool = request.app.state.arq_pool
+            await pool.enqueue_job('generate_tts_task', existing_blog.id, plain_text, blog.voice or "tr-TR-AhmetNeural")
     except Exception as e:
         await db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
